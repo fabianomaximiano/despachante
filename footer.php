@@ -20,8 +20,10 @@ $office_whatsapp_text    = get_theme_mod('office_whatsapp_text', 'Fale com o esc
 
 /* Contato no rodapé */
 $footer_address    = get_theme_mod('footer_address', '');
+$footer_zipcode    = get_theme_mod('footer_zipcode', '');
 $footer_city_state = get_theme_mod('footer_city_state', '');
 $footer_phone      = get_theme_mod('footer_phone', '');
+$footer_whatsapp   = get_theme_mod('footer_whatsapp', '');
 $footer_email      = get_theme_mod('footer_email', '');
 $footer_hours      = get_theme_mod('footer_hours', '');
 
@@ -54,7 +56,7 @@ if ($social_style === 'circle') {
     $social_class = 'footer-socials--square';
 }
 
-$has_contact_info = !empty($footer_address) || !empty($footer_city_state) || !empty($footer_phone) || !empty($footer_email) || !empty($footer_hours);
+$has_contact_info = !empty($footer_address) || !empty($footer_zipcode) || !empty($footer_city_state) || !empty($footer_phone) || !empty($footer_whatsapp) || !empty($footer_email) || !empty($footer_hours);
 $has_socials      = !empty($social_instagram) || !empty($social_facebook) || !empty($social_linkedin) || !empty($social_x);
 ?>
 
@@ -101,6 +103,13 @@ $has_socials      = !empty($social_instagram) || !empty($social_facebook) || !em
                                 </li>
                             <?php endif; ?>
 
+                            <?php if (!empty($footer_zipcode)) : ?>
+                                <li class="mb-2">
+                                    <i class="fas fa-mail-bulk mr-2"></i>
+                                    CEP: <?php echo esc_html($footer_zipcode); ?>
+                                </li>
+                            <?php endif; ?>
+
                             <?php if (!empty($footer_city_state)) : ?>
                                 <li class="mb-2">
                                     <i class="fas fa-city mr-2"></i>
@@ -112,6 +121,13 @@ $has_socials      = !empty($social_instagram) || !empty($social_facebook) || !em
                                 <li class="mb-2">
                                     <i class="fas fa-phone-alt mr-2"></i>
                                     <?php echo esc_html($footer_phone); ?>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (!empty($footer_whatsapp)) : ?>
+                                <li class="mb-2">
+                                    <i class="fab fa-whatsapp mr-2"></i>
+                                    WhatsApp: <?php echo esc_html($footer_whatsapp); ?>
                                 </li>
                             <?php endif; ?>
 

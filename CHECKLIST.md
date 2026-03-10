@@ -58,6 +58,7 @@ Use as caixas de seleção para marcar os itens concluídos.
 - [x] Campo para shortcode no painel
 - [x] Aviso quando plugin não estiver instalado
 - [x] Opções visuais no painel
+- [x] Estrutura condicional no index.php
 
 ---
 
@@ -66,6 +67,41 @@ Use as caixas de seleção para marcar os itens concluídos.
 - [x] Footer básico implementado
 - [x] CTA no rodapé
 - [x] Cor do fundo configurável
+- [x] Campo de endereço completo
+- [x] Campo de CEP
+- [x] Campo de cidade / estado
+- [x] Campo de telefone
+- [x] Campo de WhatsApp do rodapé
+- [x] Campo de e-mail
+- [x] Campo de horário de atendimento
+- [x] Exibir somente campos preenchidos
+- [x] Correção visual do fundo do rodapé
+
+---
+
+# Redes Sociais
+
+- [x] Campo LinkedIn
+- [x] Campo Instagram
+- [x] Campo Facebook
+- [x] Campo X (Twitter)
+- [x] Mostrar ícone apenas se preenchido
+- [x] Link direto para rede social
+- [x] Estilo "somente ícone"
+- [x] Estilo "ícone dentro de círculo"
+- [x] Estilo "ícone dentro de quadrado arredondado"
+
+---
+
+# WhatsApp
+
+- [x] Botão flutuante fixo
+- [x] Número configurável no painel
+- [x] Mensagem padrão configurável
+- [x] Texto do botão configurável
+- [x] Checkbox para habilitar/desabilitar botão flutuante
+- [x] Separação entre WhatsApp do desenvolvedor e WhatsApp do escritório
+- [x] Checkbox para habilitar/desabilitar botão "Falar com o Desenvolvedor"
 
 ---
 
@@ -99,6 +135,7 @@ Use as caixas de seleção para marcar os itens concluídos.
 - [ ] Proteção nonce
 - [ ] Mensagem de sucesso
 - [ ] Mensagem de erro
+- [ ] Gravação segura dos dados enviados
 
 ---
 
@@ -128,16 +165,18 @@ Exemplo de documentos:
 - [ ] Validação de tipo de arquivo
 - [ ] Limite de tamanho
 - [ ] Salvamento em diretório organizado
+- [ ] Geração de links para download dos arquivos
 
 ---
 
-## Banco de Dados
+## Banco de Dados / Leads
 
 - [ ] Criar sistema de leads
 - [ ] Salvar dados do formulário
 - [ ] Salvar serviço solicitado
 - [ ] Salvar links dos arquivos
 - [ ] Salvar data do envio
+- [ ] Salvar consentimento LGPD
 
 ---
 
@@ -169,51 +208,15 @@ Exemplo de documentos:
 
 ---
 
-# WhatsApp
-
-- [ ] Botão flutuante fixo
-- [ ] Número configurável no painel
-- [ ] Mensagem padrão configurável
-- [ ] Abrir conversa automaticamente
-
----
-
-# Rodapé Completo
-
-- [ ] Campo endereço
-- [ ] Campo cidade / estado
-- [ ] Campo telefone
-- [ ] Campo WhatsApp
-- [ ] Campo email
-- [ ] Campo horário de atendimento
-
----
-
-# Redes Sociais
-
-- [ ] Campo LinkedIn
-- [ ] Campo Instagram
-- [ ] Campo Facebook
-- [ ] Campo X (Twitter)
-
-Regras:
-
-- mostrar ícone apenas se preenchido
-- link direto para rede social
-
----
-
 # Formas de Pagamento
 
 - [ ] Criar seção de pagamento
 - [ ] Tornar seção opcional
 - [ ] Opção habilitar/desabilitar no painel
-
-Métodos:
-
-- Pix
-- Cartão de crédito (Mercado Pago)
-- Dinheiro na hora
+- [ ] Campo Pix
+- [ ] Campo cartão via Mercado Pago
+- [ ] Campo dinheiro na hora
+- [ ] Exibir somente métodos preenchidos
 
 ---
 
@@ -229,5 +232,5 @@ Métodos:
 
 # Status do Projeto
 
-Versão atual: 2.9.1  
+Versão atual: 3.0.5  
 Estado: Em desenvolvimento

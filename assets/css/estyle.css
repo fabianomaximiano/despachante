@@ -1,6 +1,6 @@
 /*
 Theme Name: Despachante Digital Flow
-Version: 3.0.3
+Version: 3.3.1
 */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -9,7 +9,6 @@ Version: 3.0.3
     --primary-color: #1d2d3d;
     --accent-color: #2da44e;
     --whatsapp-color: #25d366;
-
     --services-icon-bg: #f4ede3;
     --services-icon-border: #d8be97;
     --services-icon-color: #9a6a3a;
@@ -207,6 +206,47 @@ img {
     background: #f3fbf5;
 }
 
+.documents-checklist {
+    background: #f8f9fa;
+    border: 1px solid #e7eaef;
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.documents-checklist__empty {
+    text-align: center;
+    padding: 20px 10px;
+}
+
+.documents-checklist__grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.document-item {
+    background: #ffffff;
+    border: 1px solid #e7eaef;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.document-item__label {
+    font-weight: 700;
+    color: #102746;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.document-item .form-control-file {
+    width: 100%;
+}
+
+.document-item__selected {
+    min-height: 20px;
+    word-break: break-word;
+}
+
 .btn-success {
     background-color: var(--accent-color) !important;
     border: none !important;
@@ -295,7 +335,6 @@ img {
     transform: translateY(-2px);
 }
 
-/* Estilo: só ícone */
 .footer-socials--icon .footer-social-link {
     width: auto;
     height: auto;
@@ -308,7 +347,6 @@ img {
     font-size: 1.35rem;
 }
 
-/* Estilo: círculo */
 .footer-socials--circle .footer-social-link {
     width: 44px;
     height: 44px;
@@ -324,7 +362,6 @@ img {
     background: rgba(255,255,255,0.16);
 }
 
-/* Estilo: quadrado arredondado */
 .footer-socials--square .footer-social-link {
     width: 44px;
     height: 44px;
@@ -346,6 +383,12 @@ img {
 }
 
 /* Responsivo */
+@media (min-width: 768px) {
+    .documents-checklist__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 991.98px) {
     .services-grid .service-card__title {
         font-size: 1.75rem;

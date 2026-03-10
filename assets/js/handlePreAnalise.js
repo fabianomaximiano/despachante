@@ -1,89 +1,146 @@
-/**
- * Manipulação do formulário de Pré-Análise v2.0
- * Inclui validação, feedback de upload e animação de envio.
- */
-async function handlePreAnalise(event) {
-    event.preventDefault();
-    
-    const form = event.target;
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('formPreAnalise');
     const feedback = document.getElementById('formFeedback');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const formData = new FormData(form);
-    
-    // 1. Validação de Campos Obrigatórios (Nome, Telefone e Serviço)
-    const nome = form.querySelector('input[name="nome"]').value;
-    const telefone = form.querySelector('input[name="telefone"]').value;
-    const servico = form.querySelector('select[name="servico"]').value;
+    const submitButton = document.getElementById('submitPreAnalise');
+    const servicoSelect = document.getElementById('servicoSelect');
+    const checklistContainer = document.getElementById('serviceDocumentsChecklist');
+    const extraFilesInput = document.getElementById('extraFilesInput');
+    const selectedExtraFiles = document.getElementById('selectedExtraFiles');
 
-    if (!nome || !telefone || !servico) {
-        feedback.innerHTML = '<div class="alert alert-warning shadow-sm">Por favor, preencha todos os campos obrigatórios.</div>';
+    if (!form) {
         return;
     }
 
-    // 2. Validação de Tamanho de Arquivos (Limite de 2MB por arquivo)
-    const files = form.querySelector('input[type="file"]').files;
-    for (let file of files) {
-        if (file.size > 2 * 1024 * 1024) {
-            feedback.innerHTML = `<div class="alert alert-danger shadow-sm">O arquivo <strong>${file.name}</strong> é muito grande (máx. 2MB).</div>`;
+    const serviceDocs = (window.wp_ajax_obj && wp_ajax_obj.service_docs) ? wp_ajax_obj.service_docs : {};
+    const messages = (window.wp_ajax_obj && wp_ajax_obj.messages) ? wp_ajax_obj.messages : {};
+
+    function showFeedback(message, type) {
+        feedback.innerHTML = '<div class="alert alert-' + type + ' mb-0">' + message + '</div>';
+    }
+
+    function renderSelectedFiles(target, files) {
+        if (!target) return;
+
+        if (!files || !files.length) {
+            target.innerHTML = '';
             return;
         }
+
+        let html = '<strong>Arquivos selecionados:</strong><ul class="mb-0 pl-3">';
+        Array.from(files).forEach(function (file) {
+            html += '<li>' + file.name + ' (' + Math.round(file.size / 1024) + ' KB)</li>';
+        });
+        html += '</ul>';
+
+        target.innerHTML = html;
     }
 
-    // 3. Feedback Visual de Envio
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
-    submitBtn.disabled = true;
-    feedback.innerHTML = '';
+    function slugify(text) {
+        return text
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
+    }
 
-    try {
-        // Envio via Fetch para o endpoint AJAX do WordPress
-        const response = await fetch(wp_ajax_obj.ajax_url + '?action=process_pre_analise', {
-            method: 'POST',
-            body: formData
-        });
+    function renderChecklist(serviceId) {
+        if (!checklistContainer) return;
 
-        const result = await response.json();
-        
-        if (result.success) {
-            feedback.innerHTML = `<div class="alert alert-success shadow-sm border-0"><i class="fas fa-check-circle mr-2"></i> ${result.data || 'Enviado com sucesso!'}</div>`;
-            form.reset();
-            
-            // Reseta o texto da área de upload
-            const fileLabel = document.getElementById('file-label');
-            if (fileLabel) fileLabel.innerText = "Arraste arquivos aqui ou clique para selecionar";
-        } else {
-            throw new Error(result.data || 'Erro no processamento.');
+        const docs = serviceDocs[serviceId] || [];
+
+        if (!serviceId) {
+            checklistContainer.innerHTML = '<div class="documents-checklist__empty text-muted">' + (messages.select_service || 'Selecione um serviço.') + '</div>';
+            return;
         }
 
-    } catch (error) {
-        feedback.innerHTML = `<div class="alert alert-danger shadow-sm border-0"><i class="fas fa-exclamation-triangle mr-2"></i> Erro ao enviar: ${error.message}</div>`;
-    } finally {
-        // Restaura o botão
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.disabled = false;
+        if (!docs.length) {
+            checklistContainer.innerHTML = '<div class="documents-checklist__empty text-muted">' + (messages.no_docs || 'Sem documentos.') + '</div>';
+            return;
+        }
+
+        let html = '<div class="documents-checklist__grid">';
+
+        docs.forEach(function (doc, index) {
+            const slug = slugify(doc || ('documento_' + index));
+            html += ''
+                + '<div class="document-item">'
+                +   '<div class="document-item__header">'
+                +       '<span class="document-item__label">' + doc + '</span>'
+                +   '</div>'
+                +   '<input type="hidden" name="document_labels[' + slug + ']" value="' + doc.replace(/"/g, '&quot;') + '">'
+                +   '<div class="document-item__body">'
+                +       '<input type="file" name="documentos_checklist[' + slug + ']" class="form-control-file" accept=".jpg,.jpeg,.png,.pdf">'
+                +       '<small class="text-muted d-block mt-2">Envie ' + doc + ' em JPG, PNG ou PDF.</small>'
+                +   '</div>'
+                + '</div>';
+        });
+
+        html += '</div>';
+        checklistContainer.innerHTML = html;
     }
-}
 
-// Inicialização e Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('formPreAnalise');
-    const fileInput = document.getElementById('fileInput');
-    const fileLabel = document.getElementById('file-label');
+    if (servicoSelect) {
+        servicoSelect.addEventListener('change', function () {
+            renderChecklist(this.value);
+        });
 
-    if (form) {
-        form.addEventListener('submit', handlePreAnalise);
+        if (servicoSelect.value) {
+            renderChecklist(servicoSelect.value);
+        }
     }
 
-    // Atualiza o nome dos arquivos na interface ao selecionar
-    if (fileInput && fileLabel) {
-        fileInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileLabel.innerHTML = `<strong>${this.files.length} arquivo(s) selecionado(s)</strong>`;
-                fileLabel.closest('.upload-container').style.borderColor = '#2da44e';
-            } else {
-                fileLabel.innerText = "Arraste arquivos aqui ou clique para selecionar";
-                fileLabel.closest('.upload-container').style.borderColor = '#ced4da';
-            }
+    if (extraFilesInput) {
+        extraFilesInput.addEventListener('change', function () {
+            renderSelectedFiles(selectedExtraFiles, this.files);
         });
     }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        if (!window.wp_ajax_obj || !wp_ajax_obj.ajax_url) {
+            showFeedback('Configuração AJAX não encontrada.', 'danger');
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        if (!formData.get('nonce') && wp_ajax_obj.nonce) {
+            formData.append('nonce', wp_ajax_obj.nonce);
+        }
+
+        submitButton.disabled = true;
+        submitButton.innerText = 'Enviando...';
+        showFeedback(messages.sending || 'Enviando sua solicitação...', 'info');
+
+        fetch(wp_ajax_obj.ajax_url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+            .then(async function (response) {
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data && data.data && data.data.message ? data.data.message : 'Não foi possível enviar sua solicitação.');
+                }
+
+                return data;
+            })
+            .then(function (data) {
+                showFeedback(data.data.message || 'Solicitação enviada com sucesso.', 'success');
+                form.reset();
+                renderSelectedFiles(selectedExtraFiles, []);
+                renderChecklist('');
+            })
+            .catch(function (error) {
+                showFeedback(error.message || 'Erro ao enviar formulário.', 'danger');
+            })
+            .finally(function () {
+                submitButton.disabled = false;
+                submitButton.innerText = 'Enviar Agora';
+            });
+    });
 });

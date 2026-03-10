@@ -13,19 +13,18 @@ $hero_button_link = get_theme_mod('hero_button_link', '#pre-analise');
 
 $services_icon_shape   = get_theme_mod('services_icon_shape', 'rounded-square');
 $services_hover_effect = get_theme_mod('services_hover_effect', 'lift');
+$google_reviews_shortcode = get_theme_mod('google_reviews_shortcode', '[wp-review-slider]');
 
 $icon_shape_class = ($services_icon_shape === 'circle')
     ? 'service-icon-box--circle'
     : 'service-icon-box--rounded-square';
-
 $hover_effect_class = 'service-card--lift';
+
 if ($services_hover_effect === 'glow') {
     $hover_effect_class = 'service-card--glow';
 } elseif ($services_hover_effect === 'zoom-icon') {
     $hover_effect_class = 'service-card--zoom-icon';
 }
-
-$google_reviews_shortcode = get_theme_mod('google_reviews_shortcode', '[wp-review-slider]');
 ?>
 
 <header class="hero-section d-flex align-items-center" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('<?php echo esc_url($hero_bg); ?>') center/cover no-repeat; height: 80vh;">
@@ -140,10 +139,13 @@ $google_reviews_shortcode = get_theme_mod('google_reviews_shortcode', '[wp-revie
 
 <section id="pre-analise" class="py-5 bg-white">
     <div class="container">
-        <div class="card shadow-sm border-0 mx-auto p-4 p-md-5" style="max-width: 700px; border-radius: 15px;">
+        <div class="card shadow-sm border-0 mx-auto p-4 p-md-5" style="max-width: 820px; border-radius: 15px;">
             <h3 class="text-center font-weight-bold mb-4">Inicie sua Pré-Análise</h3>
 
             <form id="formPreAnalise" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="despachante_pre_analise_submit">
+                <input type="hidden" name="nonce" value="<?php echo esc_attr(wp_create_nonce('despachante_pre_analise_nonce')); ?>">
+
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">Nome completo</label>
                     <input type="text" name="nome" class="form-control custom-input" required>
@@ -155,8 +157,23 @@ $google_reviews_shortcode = get_theme_mod('google_reviews_shortcode', '[wp-revie
                 </div>
 
                 <div class="form-group mb-4">
+                    <label class="font-weight-bold">E-mail</label>
+                    <input type="email" name="email" class="form-control custom-input" placeholder="opcional">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Objetivo do atendimento</label>
+                    <select name="objetivo_atendimento" class="form-control custom-input">
+                        <option value="">Selecione...</option>
+                        <option value="tirar_duvidas">Quero tirar dúvidas</option>
+                        <option value="iniciar_processo">Quero iniciar meu processo</option>
+                        <option value="enviar_documentos">Quero enviar documentos para análise</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-4">
                     <label class="font-weight-bold">Serviço</label>
-                    <select name="servico" class="form-control custom-input" required>
+                    <select name="servico" id="servicoSelect" class="form-control custom-input" required>
                         <option value="">Selecione...</option>
                         <?php
                         $q_s = new WP_Query(array(
@@ -174,16 +191,45 @@ $google_reviews_shortcode = get_theme_mod('google_reviews_shortcode', '[wp-revie
                 </div>
 
                 <div class="form-group mb-4">
-                    <div class="upload-container text-center border p-4" id="drop-zone" style="border-radius:10px;">
-                        <input type="file" name="documentos[]" id="fileInput" class="d-none" multiple>
-                        <label for="fileInput" style="cursor: pointer;" class="mb-0">
-                            <i class="fas fa-upload fa-2x mb-2 text-muted"></i>
-                            <p class="mb-0 text-muted" id="file-label">Anexe documentos aqui</p>
+                    <label class="font-weight-bold">Checklist de documentos</label>
+                    <div id="serviceDocumentsChecklist" class="documents-checklist">
+                        <div class="documents-checklist__empty text-muted">
+                            Selecione um serviço para exibir os documentos necessários.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Documentos extras</label>
+                    <div class="upload-container text-center border p-4" style="border-radius:10px;">
+                        <input type="file" name="documentos_extras[]" id="extraFilesInput" class="d-none" multiple accept=".jpg,.jpeg,.png,.pdf">
+                        <label for="extraFilesInput" style="cursor: pointer;" class="mb-0">
+                            <i class="fas fa-paperclip fa-2x mb-2 text-muted"></i>
+                            <p class="mb-1 text-muted">Anexe documentos adicionais aqui</p>
+                            <small class="text-muted d-block">Formatos aceitos: JPG, PNG e PDF. Limite de 8MB por arquivo.</small>
+                        </label>
+                        <div id="selectedExtraFiles" class="mt-3 text-left small"></div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Mensagem</label>
+                    <textarea name="mensagem" rows="4" class="form-control" style="border-radius:10px;" placeholder="Descreva sua necessidade, se quiser."></textarea>
+                </div>
+
+                <div class="form-group mb-4">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="lgpdAceito" name="lgpd_aceito" value="1">
+                        <label class="custom-control-label" for="lgpdAceito">
+                            Autorizo o envio e armazenamento dos meus dados para retorno do atendimento.
                         </label>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success btn-lg btn-block font-weight-bold py-3">Enviar Agora</button>
+                <button type="submit" class="btn btn-success btn-lg btn-block font-weight-bold py-3" id="submitPreAnalise">
+                    Enviar Agora
+                </button>
+
                 <div id="formFeedback" class="mt-3 text-center"></div>
             </form>
         </div>
