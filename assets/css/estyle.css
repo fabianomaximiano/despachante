@@ -1,0 +1,391 @@
+/*
+Theme Name: Despachante Digital Flow
+Version: 3.0.3
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+    --primary-color: #1d2d3d;
+    --accent-color: #2da44e;
+    --whatsapp-color: #25d366;
+
+    --services-icon-bg: #f4ede3;
+    --services-icon-border: #d8be97;
+    --services-icon-color: #9a6a3a;
+    --services-card-border: #ece3d7;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--primary-color);
+    background: #ffffff;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Header / Navbar */
+.navbar-brand {
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+.navbar .nav-link {
+    font-weight: 600;
+}
+
+/* Hero */
+.hero-section {
+    position: relative;
+}
+
+.hero-section h1 {
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+/* Serviços */
+.services-grid .service-card {
+    background: #ffffff;
+    border: 1px solid var(--services-card-border) !important;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.services-grid .service-card__title {
+    font-size: 2rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #102746;
+    margin-bottom: 1rem;
+}
+
+.services-grid .service-card__content,
+.services-grid .service-card__content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #667792;
+    margin-bottom: 0;
+}
+
+.services-grid .service-card .service-icon-box {
+    width: 108px !important;
+    height: 108px !important;
+    min-width: 108px !important;
+    min-height: 108px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 22px !important;
+    margin: 0 auto 24px auto !important;
+    background: var(--services-icon-bg) !important;
+    border: 2px solid var(--services-icon-border) !important;
+    color: var(--services-icon-color) !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    line-height: 1 !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-radius 0.25s ease, background-color 0.25s ease, border-color 0.25s ease !important;
+}
+
+.services-grid .service-card .service-icon-box i,
+.services-grid .service-card .service-icon-box svg,
+.services-grid .service-card .service-icon-box .fas,
+.services-grid .service-card .service-icon-box .far,
+.services-grid .service-card .service-icon-box .fab {
+    line-height: 1 !important;
+    color: inherit !important;
+    display: inline-block !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+.services-grid .service-card .service-icon-box i:not([class*="fa-1x"]):not([class*="fa-2x"]):not([class*="fa-3x"]):not([class*="fa-4x"]):not([class*="fa-5x"]):not([class*="fa-6x"]):not([class*="fa-7x"]):not([class*="fa-8x"]):not([class*="fa-9x"]):not([class*="fa-10x"]) {
+    font-size: 42px !important;
+}
+
+.services-grid .service-card .service-icon-box--rounded-square {
+    border-radius: 18px !important;
+}
+
+.services-grid .service-card .service-icon-box--circle {
+    border-radius: 50% !important;
+}
+
+.services-grid .service-card--lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.services-grid .service-card--glow:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 4px rgba(31, 61, 99, 0.08), 0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+.services-grid .service-card--zoom-icon:hover .service-icon-box {
+    transform: scale(1.08);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.10);
+}
+
+/* Reviews */
+.reviews-section .alert {
+    font-size: 1rem;
+}
+
+/* FAQ */
+#faqAccordion .card {
+    border: none;
+    margin-bottom: 10px;
+    background: transparent;
+}
+
+#faqAccordion .card-header {
+    border: none;
+    background: transparent;
+}
+
+#faqAccordion .btn-link {
+    text-decoration: none !important;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px !important;
+    color: var(--primary-color) !important;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+#faqAccordion .btn-link::after {
+    content: '+';
+    font-size: 22px;
+    color: var(--accent-color);
+    margin-left: 15px;
+}
+
+#faqAccordion .btn-link:not(.collapsed)::after {
+    content: '−';
+}
+
+#faqAccordion .card-body {
+    background: #fff;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Formulário */
+.custom-input {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    height: 3.5rem !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+
+.custom-input:focus {
+    background-color: #fff !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 0.15rem rgba(45, 164, 78, 0.15) !important;
+}
+
+.upload-container {
+    border: 2px dashed #ced4da !important;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.upload-container:hover {
+    border-color: var(--accent-color) !important;
+    background: #f3fbf5;
+}
+
+.btn-success {
+    background-color: var(--accent-color) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(45, 164, 78, 0.18);
+}
+
+/* WhatsApp Float - escritório */
+.whatsapp-float {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--whatsapp-color);
+    color: #fff !important;
+    border-radius: 999px;
+    padding: 14px 20px;
+    font-weight: 700;
+    box-shadow: 0 12px 28px rgba(37, 211, 102, 0.28);
+    text-decoration: none !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.whatsapp-float:hover {
+    color: #fff !important;
+    text-decoration: none !important;
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(37, 211, 102, 0.34);
+}
+
+.whatsapp-float i {
+    font-size: 1.25rem;
+}
+
+/* Footer */
+.footer-cta {
+    background: linear-gradient(180deg, #1d2d3d 0%, #162534 100%);
+    color: #ffffff;
+}
+
+.footer-cta .lead {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.footer-contact-list li {
+    color: rgba(255,255,255,0.88);
+    line-height: 1.7;
+}
+
+.footer-link {
+    color: rgba(255,255,255,0.88);
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.footer-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.footer-social-link {
+    color: #ffffff;
+    text-decoration: none;
+    transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.footer-social-link:hover {
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* Estilo: só ícone */
+.footer-socials--icon .footer-social-link {
+    width: auto;
+    height: auto;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+/* Estilo: círculo */
+.footer-socials--circle .footer-social-link {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.footer-socials--circle .footer-social-link:hover {
+    background: rgba(255,255,255,0.16);
+}
+
+/* Estilo: quadrado arredondado */
+.footer-socials--square .footer-social-link {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.footer-socials--square .footer-social-link:hover {
+    background: rgba(255,255,255,0.16);
+}
+
+.footer-copy-wrap {
+    text-align: center;
+    color: rgba(255,255,255,0.72);
+}
+
+/* Responsivo */
+@media (max-width: 991.98px) {
+    .services-grid .service-card__title {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .services-grid .service-card {
+        border-radius: 12px;
+        padding: 2rem 1.5rem !important;
+    }
+
+    .services-grid .service-card__title {
+        font-size: 1.5rem;
+    }
+
+    .services-grid .service-card .service-icon-box {
+        width: 90px !important;
+        height: 90px !important;
+        min-width: 90px !important;
+        min-height: 90px !important;
+        padding: 18px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .services-grid .service-card .service-icon-box i:not([class*="fa-1x"]):not([class*="fa-2x"]):not([class*="fa-3x"]):not([class*="fa-4x"]):not([class*="fa-5x"]):not([class*="fa-6x"]):not([class*="fa-7x"]):not([class*="fa-8x"]):not([class*="fa-9x"]):not([class*="fa-10x"]) {
+        font-size: 34px !important;
+    }
+
+    .whatsapp-float {
+        right: 16px;
+        bottom: 16px;
+        padding: 12px 16px;
+    }
+
+    .whatsapp-float span {
+        display: none;
+    }
+
+    .footer-socials {
+        justify-content: center;
+    }
+}

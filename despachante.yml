@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db_despachante:
+    image: mysql:8.0
+    container_name: db_despachante
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: despachante_db
+      MYSQL_USER: user_despachante
+      MYSQL_PASSWORD: password123
+    volumes:
+      - db_data_despachante:/var/lib/mysql
+
+  wordpress_despachante:
+    depends_on:
+      - db_despachante
+    image: wordpress:latest
+    container_name: wp_despachante
+    restart: always
+    ports:
+      - "8085:80"
+    environment:
+      WORDPRESS_DB_HOST: db_despachante
+      WORDPRESS_DB_USER: user_despachante
+      WORDPRESS_DB_PASSWORD: password123
+      WORDPRESS_DB_NAME: despachante_db
+    volumes:
+      - .:/var/www/html/wp-content/themes/despachante-theme
+
+volumes:
+  db_data_despachante: # Agora corretamente mapeado como um objeto
+  uploads_clientes:     # Definido como um volume nomeado para persistência
