@@ -20,21 +20,47 @@ Aparência → Temas
 
 ## 3 Instalar plugins necessários
 
-Plugin obrigatório:
+Plugins obrigatórios:
 
-WP Google Review Slider
+WP Google Review Slider  
+WP Mail SMTP
 
-Link:
+Links:
 
-https://wordpress.org/plugins/wp-google-review-slider/
+https://wordpress.org/plugins/wp-google-review-slider/  
+https://wordpress.org/plugins/wp-mail-smtp/
 
-Após instalar:
+Após instalar o plugin de avaliações:
 
 Google Reviews → Create Review Slider
 
+Após instalar o plugin SMTP:
+
+WP Mail SMTP → Settings
+
+Configure o envio de e-mails do WordPress.
+
 ---
 
-## 4 Cadastrar serviços
+## 4 Configurar envio de e-mails
+
+O sistema de leads utiliza o WordPress para disparar notificações por e-mail.
+
+Para isso, configure o plugin WP Mail SMTP.
+
+Exemplo com Gmail:
+
+- SMTP Host: smtp.gmail.com
+- Porta: 587
+- Criptografia: TLS
+- Usuário: seuemail@gmail.com
+- Senha: senha de aplicativo
+
+Depois faça o envio de teste no plugin.
+
+---
+
+## 5 Cadastrar serviços
 
 No painel:
 
@@ -44,7 +70,8 @@ Informe:
 
 Título  
 Descrição  
-Ícone FontAwesome
+Ícone FontAwesome  
+Checklist de documentos
 
 Exemplo:
 
@@ -53,7 +80,7 @@ fas fa-exchange-alt
 
 ---
 
-## 5 Cadastrar FAQ
+## 6 Cadastrar FAQ
 
 No painel:
 
@@ -61,7 +88,7 @@ FAQ → Adicionar novo
 
 ---
 
-## 6 Configurar personalização
+## 7 Configurar personalização
 
 Acesse:
 
@@ -72,16 +99,37 @@ Configure:
 cores  
 estilo dos cards  
 cores da seção de avaliações  
+e-mail do escritório  
 
 ---
 
-## 7 Inserir avaliações do Google
+## 8 Inserir avaliações do Google
 
 Crie o slider no plugin.
 
 Depois confirme que o shortcode gerado está ativo.
 
 A landing page exibirá automaticamente.
+
+---
+
+## 9 Testar formulário
+
+Teste o envio do formulário com:
+
+- nome
+- WhatsApp
+- e-mail
+- serviço
+- mensagem
+- documentos
+
+Confirme:
+
+- validação dos campos
+- salvamento do lead
+- salvamento dos arquivos
+- recebimento do e-mail
 
 ---
 

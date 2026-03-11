@@ -10,6 +10,32 @@ https://semver.org
 
 ---
 
+# [3.3.7] - 2026-03-11
+
+## Adicionado
+
+- validação backend para WhatsApp
+- suporte documentado para envio de e-mails via plugin SMTP
+- instrução oficial para instalar o plugin WP Mail SMTP
+- documentação do fluxo de notificações por e-mail
+
+## Melhorias
+
+- documentação atualizada para refletir o estado real do projeto
+- checklist do projeto ajustado com funcionalidades já concluídas
+- documentação de deploy e instalação ampliada com configuração de e-mail
+
+## Observações
+
+Para funcionamento correto do envio de e-mails em ambiente local e produção, recomenda-se instalar e configurar:
+
+- WP Mail SMTP
+
+Link oficial:
+https://wordpress.org/plugins/wp-mail-smtp/
+
+---
+
 # [2.9.1] - 2026-03-10
 
 ## Adicionado

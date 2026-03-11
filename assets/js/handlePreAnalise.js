@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const checklistContainer = document.getElementById('serviceDocumentsChecklist');
     const extraFilesInput = document.getElementById('extraFilesInput');
     const selectedExtraFiles = document.getElementById('selectedExtraFiles');
+    const telefoneInput = form ? form.querySelector('input[name="telefone"]') : null;
+    const emailInput = form ? form.querySelector('input[name="email"]') : null;
+    const nomeInput = form ? form.querySelector('input[name="nome"]') : null;
+    const objetivoInput = form ? form.querySelector('select[name="objetivo_atendimento"]') : null;
+    const mensagemInput = form ? form.querySelector('textarea[name="mensagem"]') : null;
 
     if (!form) {
         return;
@@ -15,7 +20,66 @@ document.addEventListener('DOMContentLoaded', function () {
     const messages = (window.wp_ajax_obj && wp_ajax_obj.messages) ? wp_ajax_obj.messages : {};
 
     function showFeedback(message, type) {
+        if (!feedback) return;
         feedback.innerHTML = '<div class="alert alert-' + type + ' mb-0">' + message + '</div>';
+    }
+
+    function clearFeedback() {
+        if (!feedback) return;
+        feedback.innerHTML = '';
+    }
+
+    function ensureFieldErrorElement(field) {
+        if (!field) return null;
+
+        let errorEl = field.parentNode.querySelector('.field-error-message');
+
+        if (!errorEl) {
+            errorEl = document.createElement('div');
+            errorEl.className = 'field-error-message text-danger small mt-2';
+            errorEl.style.display = 'none';
+            field.parentNode.appendChild(errorEl);
+        }
+
+        return errorEl;
+    }
+
+    function showFieldError(field, message) {
+        if (!field) return;
+
+        field.style.borderColor = '#dc3545';
+        field.style.boxShadow = '0 0 0 0.2rem rgba(220,53,69,0.15)';
+
+        const errorEl = ensureFieldErrorElement(field);
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    }
+
+    function clearFieldError(field) {
+        if (!field) return;
+
+        field.style.borderColor = '';
+        field.style.boxShadow = '';
+
+        const errorEl = ensureFieldErrorElement(field);
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.style.display = 'none';
+        }
+    }
+
+    function scrollToField(field) {
+        if (!field) return;
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        field.focus();
+    }
+
+    function clearAllFieldErrors() {
+        [nomeInput, telefoneInput, emailInput, servicoSelect, objetivoInput, mensagemInput].forEach(function (field) {
+            clearFieldError(field);
+        });
     }
 
     function renderSelectedFiles(target, files) {
@@ -45,8 +109,61 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/^_+|_+$/g, '');
     }
 
+    function onlyDigits(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    function applyPhoneMask(value) {
+        const digits = onlyDigits(value).slice(0, 11);
+
+        if (digits.length <= 2) {
+            return digits.length ? '(' + digits : '';
+        }
+
+        if (digits.length <= 6) {
+            return '(' + digits.slice(0, 2) + ') ' + digits.slice(2);
+        }
+
+        if (digits.length <= 10) {
+            return '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 6) + '-' + digits.slice(6);
+        }
+
+        return '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 7) + '-' + digits.slice(7);
+    }
+
+    function isValidPhone(value) {
+        const digits = onlyDigits(value);
+        return digits.length >= 10 && digits.length <= 11;
+    }
+
+    function isValidEmail(value) {
+        const email = String(value || '').trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        return emailRegex.test(email);
+    }
+
+    function clearChecklistErrors() {
+        if (!checklistContainer) return;
+
+        const items = checklistContainer.querySelectorAll('.document-item');
+
+        items.forEach(function (item) {
+            item.classList.remove('document-item--error');
+            item.style.border = '';
+            item.style.background = '';
+
+            const errorBox = item.querySelector('.document-item__error');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+                errorBox.innerText = '';
+            }
+        });
+    }
+
     function renderChecklist(serviceId) {
         if (!checklistContainer) return;
+
+        clearChecklistErrors();
 
         const docs = serviceDocs[serviceId] || [];
 
@@ -64,15 +181,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         docs.forEach(function (doc, index) {
             const slug = slugify(doc || ('documento_' + index));
+
             html += ''
-                + '<div class="document-item">'
+                + '<div class="document-item" data-doc-slug="' + slug + '">'
                 +   '<div class="document-item__header">'
-                +       '<span class="document-item__label">' + doc + '</span>'
+                +       '<span class="document-item__label">' + doc + ' <span style="color:#a00;">*</span></span>'
                 +   '</div>'
-                +   '<input type="hidden" name="document_labels[' + slug + ']" value="' + doc.replace(/"/g, '&quot;') + '">'
+                +   '<input type="hidden" name="document_labels[' + slug + ']" value="' + String(doc).replace(/"/g, '&quot;') + '">'
                 +   '<div class="document-item__body">'
-                +       '<input type="file" name="documentos_checklist[' + slug + ']" class="form-control-file" accept=".jpg,.jpeg,.png,.pdf">'
+                +       '<input type="file" name="documentos_checklist[' + slug + ']" class="form-control-file documento-checklist-input" data-label="' + String(doc).replace(/"/g, '&quot;') + '" accept=".jpg,.jpeg,.png,.pdf">'
                 +       '<small class="text-muted d-block mt-2">Envie ' + doc + ' em JPG, PNG ou PDF.</small>'
+                +       '<div class="document-item__error text-danger small mt-2" style="display:none;"></div>'
                 +   '</div>'
                 + '</div>';
         });
@@ -81,8 +200,156 @@ document.addEventListener('DOMContentLoaded', function () {
         checklistContainer.innerHTML = html;
     }
 
+    function validateChecklistFiles() {
+        if (!checklistContainer) {
+            return true;
+        }
+
+        clearChecklistErrors();
+
+        const inputs = checklistContainer.querySelectorAll('.documento-checklist-input');
+
+        if (!inputs.length) {
+            return true;
+        }
+
+        let firstInvalidItem = null;
+        const missingDocs = [];
+
+        inputs.forEach(function (input) {
+            if (!input.files || !input.files.length) {
+                const label = input.getAttribute('data-label') || 'Documento obrigatório';
+                missingDocs.push(label);
+
+                const item = input.closest('.document-item');
+                if (item) {
+                    if (!firstInvalidItem) {
+                        firstInvalidItem = item;
+                    }
+
+                    item.classList.add('document-item--error');
+                    item.style.border = '1px solid #dc3545';
+                    item.style.background = '#fff5f5';
+
+                    const errorBox = item.querySelector('.document-item__error');
+                    if (errorBox) {
+                        errorBox.innerText = 'Este documento é obrigatório.';
+                        errorBox.style.display = 'block';
+                    }
+                }
+            }
+        });
+
+        if (missingDocs.length) {
+            if (firstInvalidItem) {
+                firstInvalidItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateFormFields() {
+        clearAllFieldErrors();
+        clearFeedback();
+
+        const nome = nomeInput ? nomeInput.value.trim() : '';
+        const telefone = telefoneInput ? telefoneInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const servico = servicoSelect ? servicoSelect.value : '';
+
+        if (!nome) {
+            showFieldError(nomeInput, 'Informe seu nome.');
+            scrollToField(nomeInput);
+            return false;
+        }
+
+        if (!telefone) {
+            showFieldError(telefoneInput, 'Informe seu WhatsApp.');
+            scrollToField(telefoneInput);
+            return false;
+        }
+
+        if (!isValidPhone(telefone)) {
+            showFieldError(telefoneInput, 'Informe um WhatsApp válido com DDD.');
+            scrollToField(telefoneInput);
+            return false;
+        }
+
+        if (!email) {
+            showFieldError(emailInput, 'Informe seu e-mail.');
+            scrollToField(emailInput);
+            return false;
+        }
+
+        if (!isValidEmail(email)) {
+            showFieldError(emailInput, 'Informe um e-mail válido.');
+            scrollToField(emailInput);
+            return false;
+        }
+
+        if (!servico) {
+            showFieldError(servicoSelect, 'Selecione um serviço.');
+            scrollToField(servicoSelect);
+            return false;
+        }
+
+        if (!validateChecklistFiles()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    if (telefoneInput) {
+        telefoneInput.setAttribute('inputmode', 'numeric');
+        telefoneInput.setAttribute('autocomplete', 'tel');
+        telefoneInput.setAttribute('placeholder', '(11) 99999-9999');
+
+        telefoneInput.addEventListener('input', function () {
+            this.value = applyPhoneMask(this.value);
+            clearFieldError(this);
+        });
+
+        telefoneInput.addEventListener('blur', function () {
+            this.value = applyPhoneMask(this.value);
+        });
+    }
+
+    if (emailInput) {
+        emailInput.setAttribute('autocomplete', 'email');
+        emailInput.setAttribute('placeholder', 'seuemail@dominio.com');
+
+        emailInput.addEventListener('input', function () {
+            clearFieldError(this);
+        });
+
+        emailInput.addEventListener('blur', function () {
+            const value = this.value.trim();
+
+            if (!value) {
+                showFieldError(this, 'Informe seu e-mail.');
+                return;
+            }
+
+            if (!isValidEmail(value)) {
+                showFieldError(this, 'Informe um e-mail válido.');
+            } else {
+                clearFieldError(this);
+            }
+        });
+    }
+
+    if (nomeInput) {
+        nomeInput.addEventListener('input', function () {
+            clearFieldError(this);
+        });
+    }
+
     if (servicoSelect) {
         servicoSelect.addEventListener('change', function () {
+            clearFieldError(this);
             renderChecklist(this.value);
         });
 
@@ -105,6 +372,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        if (!validateFormFields()) {
+            return;
+        }
+
         const formData = new FormData(form);
 
         if (!formData.get('nonce') && wp_ajax_obj.nonce) {
@@ -121,15 +392,27 @@ document.addEventListener('DOMContentLoaded', function () {
             credentials: 'same-origin'
         })
             .then(async function (response) {
-                const data = await response.json();
+                let data = null;
+
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('Resposta inválida do servidor.');
+                }
 
                 if (!response.ok || !data.success) {
-                    throw new Error(data && data.data && data.data.message ? data.data.message : 'Não foi possível enviar sua solicitação.');
+                    throw new Error(
+                        data && data.data && data.data.message
+                            ? data.data.message
+                            : 'Não foi possível enviar sua solicitação.'
+                    );
                 }
 
                 return data;
             })
             .then(function (data) {
+                clearAllFieldErrors();
+                clearChecklistErrors();
                 showFeedback(data.data.message || 'Solicitação enviada com sucesso.', 'success');
                 form.reset();
                 renderSelectedFiles(selectedExtraFiles, []);

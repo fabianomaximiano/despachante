@@ -1,13 +1,13 @@
 <?php
 /**
  * Tema: Despachante Digital Flow
- * Versão: 3.3.1
+ * Versão: 3.3.5
  */
 
 function despachante_digital_scripts() {
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
     wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css');
-    wp_enqueue_style('main-style', get_template_directory_uri() . '/assets/css/estyle.css', array('bootstrap-css'), '3.3.1');
+    wp_enqueue_style('main-style', get_template_directory_uri() . '/assets/css/estyle.css', array('bootstrap-css'), '3.3.5');
 
     wp_enqueue_script('jquery');
     wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js', array('jquery'), '4.6.2', true);
@@ -17,7 +17,7 @@ function despachante_digital_scripts() {
             'handle-pre-analise',
             get_template_directory_uri() . '/assets/js/handlePreAnalise.js',
             array('jquery'),
-            '3.3.1',
+            '3.3.5',
             true
         );
 
@@ -89,12 +89,117 @@ function despachante_normalize_document_label($label) {
     return trim(wp_strip_all_tags((string) $label));
 }
 
+function despachante_table_has_column($table_name, $column_name) {
+    global $wpdb;
+
+    $table_name  = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $table_name);
+    $column_name = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $column_name);
+
+    if (empty($table_name) || empty($column_name)) {
+        return false;
+    }
+
+    $result = $wpdb->get_var("SHOW COLUMNS FROM `{$table_name}` LIKE '{$column_name}'");
+
+    return !empty($result);
+}
+
+function despachante_get_runtime_base_url() {
+    $scheme = is_ssl() ? 'https' : 'http';
+    $host   = '';
+
+    if (!empty($_SERVER['HTTP_HOST'])) {
+        $host = sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST']));
+    }
+
+    if (empty($host) || $host === '0.0.0.0' || $host === '127.0.0.1') {
+        $site_url = site_url();
+        $parts    = wp_parse_url($site_url);
+
+        if (!empty($parts['scheme'])) {
+            $scheme = $parts['scheme'];
+        }
+
+        if (!empty($parts['host']) && !in_array($parts['host'], array('0.0.0.0', '127.0.0.1'), true)) {
+            $host = $parts['host'];
+
+            if (!empty($parts['port'])) {
+                $host .= ':' . $parts['port'];
+            }
+        }
+    }
+
+    if (empty($host) || $host === '0.0.0.0' || $host === '127.0.0.1') {
+        $host = 'localhost:8085';
+    }
+
+    return $scheme . '://' . $host;
+}
+
+function despachante_build_public_upload_url($absolute_file_path) {
+    $absolute_file_path = wp_normalize_path($absolute_file_path);
+    $content_dir        = wp_normalize_path(WP_CONTENT_DIR);
+
+    $relative_path = '';
+
+    if (strpos($absolute_file_path, $content_dir) === 0) {
+        $relative_path = 'wp-content/' . ltrim(str_replace($content_dir, '', $absolute_file_path), '/');
+    } else {
+        $base_dir = wp_normalize_path(ABSPATH);
+        $relative_path = ltrim(str_replace($base_dir, '', $absolute_file_path), '/');
+    }
+
+    $relative_path = ltrim(str_replace('\\', '/', $relative_path), '/');
+
+    return esc_url_raw(trailingslashit(despachante_get_runtime_base_url()) . $relative_path);
+}
+
+function despachante_normalize_public_url($url, $file_path = '') {
+    $url = trim((string) $url);
+
+    if (!empty($file_path)) {
+        $normalized_from_path = despachante_build_public_upload_url($file_path);
+
+        if (
+            empty($url) ||
+            strpos($url, '0.0.0.0') !== false ||
+            strpos($url, '127.0.0.1') !== false
+        ) {
+            return $normalized_from_path;
+        }
+    }
+
+    if (empty($url)) {
+        return '';
+    }
+
+    $parts = wp_parse_url($url);
+
+    if (empty($parts['host'])) {
+        return $url;
+    }
+
+    if (in_array($parts['host'], array('0.0.0.0', '127.0.0.1'), true)) {
+        $runtime = wp_parse_url(despachante_get_runtime_base_url());
+        $scheme  = !empty($runtime['scheme']) ? $runtime['scheme'] : 'http';
+        $host    = !empty($runtime['host']) ? $runtime['host'] : 'localhost';
+        $port    = !empty($runtime['port']) ? ':' . $runtime['port'] : '';
+        $path    = !empty($parts['path']) ? $parts['path'] : '';
+        $query   = !empty($parts['query']) ? '?' . $parts['query'] : '';
+        $frag    = !empty($parts['fragment']) ? '#' . $parts['fragment'] : '';
+
+        return esc_url_raw($scheme . '://' . $host . $port . $path . $query . $frag);
+    }
+
+    return esc_url_raw($url);
+}
+
 /* ======================================
 BANCO DE DADOS - LEADS E ARQUIVOS
 ====================================== */
 
 function despachante_get_db_version() {
-    return '1.2.0';
+    return '1.2.1';
 }
 
 function despachante_create_database_tables() {
@@ -1004,24 +1109,38 @@ function despachante_handle_single_upload($file, $lead_id, $document_type = 'doc
     global $wpdb;
     $files_table = $wpdb->prefix . 'despachante_lead_files';
 
-    $wpdb->insert(
-        $files_table,
-        array(
-            'lead_id'        => $lead_id,
-            'tipo_documento' => $document_type,
-            'document_slug'  => $document_slug,
-            'is_checklist'   => (int) $is_checklist,
-            'file_name'      => sanitize_file_name($file['name']),
-            'file_url'       => esc_url_raw($uploaded['url']),
-            'file_path'      => sanitize_text_field($uploaded['file']),
-            'mime_type'      => sanitize_text_field($filetype['type']),
-            'attachment_id'  => (int) $attachment_id,
-        ),
-        array('%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d')
+    $public_file_url = despachante_build_public_upload_url($uploaded['file']);
+
+    $insert_data = array(
+        'lead_id'        => $lead_id,
+        'tipo_documento' => $document_type,
+        'file_name'      => sanitize_file_name($file['name']),
+        'file_url'       => $public_file_url,
+        'file_path'      => sanitize_text_field($uploaded['file']),
+        'mime_type'      => sanitize_text_field($filetype['type']),
+        'attachment_id'  => (int) $attachment_id,
     );
 
+    $insert_format = array('%d', '%s', '%s', '%s', '%s', '%s', '%d');
+
+    if (despachante_table_has_column($files_table, 'document_slug')) {
+        $insert_data['document_slug'] = $document_slug;
+        array_splice($insert_format, 2, 0, '%s');
+    }
+
+    if (despachante_table_has_column($files_table, 'is_checklist')) {
+        $insert_data['is_checklist'] = (int) $is_checklist;
+        array_splice($insert_format, despachante_table_has_column($files_table, 'document_slug') ? 3 : 2, 0, '%d');
+    }
+
+    $inserted = $wpdb->insert($files_table, $insert_data, $insert_format);
+
+    if ($inserted === false) {
+        return new WP_Error('db_insert_file_error', 'O upload foi recebido, mas não foi possível registrar o arquivo no banco de dados.');
+    }
+
     return array(
-        'url'           => $uploaded['url'],
+        'url'           => $public_file_url,
         'path'          => $uploaded['file'],
         'attachment_id' => $attachment_id,
         'file_name'     => $file['name'],
@@ -1088,6 +1207,39 @@ function despachante_extract_checklist_files($files_array) {
     return $normalized;
 }
 
+function despachante_validate_required_checklist_files($servico, $files_array) {
+    $required_docs = despachante_get_service_required_documents($servico);
+
+    if (empty($required_docs)) {
+        return true;
+    }
+
+    $normalized_files = despachante_extract_checklist_files($files_array);
+    $missing_docs = array();
+
+    foreach ($required_docs as $doc_label) {
+        $slug = despachante_slugify($doc_label);
+
+        if (
+            !isset($normalized_files[$slug]) ||
+            empty($normalized_files[$slug]['name']) ||
+            !isset($normalized_files[$slug]['error']) ||
+            (int) $normalized_files[$slug]['error'] !== UPLOAD_ERR_OK
+        ) {
+            $missing_docs[] = $doc_label;
+        }
+    }
+
+    if (!empty($missing_docs)) {
+        return new WP_Error(
+            'missing_required_documents',
+            'Envie todos os documentos obrigatórios do checklist: ' . implode(', ', $missing_docs) . '.'
+        );
+    }
+
+    return true;
+}
+
 function despachante_handle_pre_analise_submission() {
     check_ajax_referer('despachante_pre_analise_nonce', 'nonce');
 
@@ -1107,8 +1259,25 @@ function despachante_handle_pre_analise_submission() {
         wp_send_json_error(array('message' => 'Informe seu WhatsApp.'), 400);
     }
 
+    if (empty($email)) {
+        wp_send_json_error(array('message' => 'Informe seu e-mail.'), 400);
+    }
+
+    if (!is_email($email)) {
+        wp_send_json_error(array('message' => 'Informe um e-mail válido.'), 400);
+    }
+
     if (empty($servico)) {
         wp_send_json_error(array('message' => 'Selecione um serviço.'), 400);
+    }
+
+    $checklist_validation = despachante_validate_required_checklist_files(
+        $servico,
+        isset($_FILES['documentos_checklist']) ? $_FILES['documentos_checklist'] : array()
+    );
+
+    if (is_wp_error($checklist_validation)) {
+        wp_send_json_error(array('message' => $checklist_validation->get_error_message()), 400);
     }
 
     $servico_post = get_post($servico);
@@ -1255,7 +1424,12 @@ function despachante_render_admin_leads_page() {
 
         if (!empty($files)) {
             foreach ($files as $file) {
-                $key = !empty($file->document_slug) ? $file->document_slug : despachante_slugify($file->tipo_documento);
+                $doc_slug_value = isset($file->document_slug) ? $file->document_slug : '';
+                $key = !empty($doc_slug_value) ? $doc_slug_value : despachante_slugify($file->tipo_documento);
+                $file->file_url = despachante_normalize_public_url(
+                    isset($file->file_url) ? $file->file_url : '',
+                    isset($file->file_path) ? $file->file_path : ''
+                );
                 $uploaded_map[$key] = $file;
             }
         }
@@ -1315,12 +1489,18 @@ function despachante_render_admin_leads_page() {
             echo '<thead><tr><th>Documento</th><th>Checklist</th><th>Arquivo</th><th>Tipo</th><th>Download</th></tr></thead><tbody>';
 
             foreach ($files as $file) {
+                $is_checklist_value = isset($file->is_checklist) ? (int) $file->is_checklist : 0;
+                $download_url = despachante_normalize_public_url(
+                    isset($file->file_url) ? $file->file_url : '',
+                    isset($file->file_path) ? $file->file_path : ''
+                );
+
                 echo '<tr>';
                 echo '<td>' . esc_html($file->tipo_documento) . '</td>';
-                echo '<td>' . ((int) $file->is_checklist === 1 ? 'Sim' : 'Não') . '</td>';
+                echo '<td>' . ($is_checklist_value === 1 ? 'Sim' : 'Não') . '</td>';
                 echo '<td>' . esc_html($file->file_name) . '</td>';
                 echo '<td>' . esc_html($file->mime_type) . '</td>';
-                echo '<td><a class="button button-primary" href="' . esc_url($file->file_url) . '" target="_blank" rel="noopener noreferrer">Abrir / Baixar</a></td>';
+                echo '<td><a class="button button-primary" href="' . esc_url($download_url) . '" target="_blank" rel="noopener noreferrer">Abrir / Baixar</a></td>';
                 echo '</tr>';
             }
 

@@ -84,7 +84,57 @@ Instale e ative o plugin.
 
 ---
 
-# 5. Criar Slider de Avaliações
+# 5. Instalar Plugin de SMTP
+
+Para garantir o envio correto dos e-mails do WordPress, instale o plugin:
+
+WP Mail SMTP
+
+Link oficial:
+
+https://wordpress.org/plugins/wp-mail-smtp/
+
+No painel:
+
+Plugins → Adicionar novo
+
+Pesquise por:
+
+WP Mail SMTP
+
+Instale e ative o plugin.
+
+---
+
+# 6. Configurar SMTP
+
+Após ativar o plugin:
+
+WP Mail SMTP → Settings
+
+Configure com o e-mail que será utilizado no projeto.
+
+Exemplo com Gmail:
+
+- SMTP Host: smtp.gmail.com
+- Porta: 587
+- Criptografia: TLS
+- Usuário: seuemail@gmail.com
+- Senha: senha de aplicativo
+
+Exemplo com e-mail do domínio:
+
+- SMTP Host: conforme o provedor
+- Porta: 465 ou 587
+- Criptografia: SSL/TLS ou TLS
+- Usuário: email@seudominio.com
+- Senha: senha da conta
+
+Faça o teste de envio dentro do plugin.
+
+---
+
+# 7. Criar Slider de Avaliações
 
 Após ativar o plugin, configure o slider.
 
@@ -102,7 +152,7 @@ Exemplo:
 
 ---
 
-# 6. Inserir Shortcode no Tema
+# 8. Inserir Shortcode no Tema
 
 Acesse:
 
@@ -120,7 +170,7 @@ Exemplo:
 
 ---
 
-# 7. Configurar Hero da Página
+# 9. Configurar Hero da Página
 
 No painel:
 
@@ -150,7 +200,7 @@ Link
 
 ---
 
-# 8. Cadastrar Serviços
+# 10. Cadastrar Serviços
 
 No painel:
 
@@ -161,6 +211,7 @@ Informe:
 - título do serviço
 - descrição
 - ícone FontAwesome
+- checklist de documentos
 
 Exemplo de ícones:
 
@@ -173,7 +224,7 @@ fas fa-cogs
 
 ---
 
-# 9. Cadastrar FAQ
+# 11. Cadastrar FAQ
 
 No painel:
 
@@ -188,7 +239,7 @@ Esses itens aparecerão automaticamente na seção de perguntas frequentes.
 
 ---
 
-# 10. Testar Formulário
+# 12. Testar Formulário
 
 A landing possui formulário de pré-análise.
 
@@ -196,7 +247,9 @@ Campos:
 
 - nome
 - WhatsApp
+- e-mail
 - serviço desejado
+- mensagem
 - upload de documentos
 
 O comportamento do formulário é controlado por:
@@ -205,9 +258,16 @@ assets/js/handlePreAnalise.js
 
 Teste o envio diretamente na página inicial.
 
+Confirme:
+
+- mensagens de validação
+- salvamento do lead
+- salvamento dos documentos
+- recebimento do e-mail
+
 ---
 
-# 11. Personalizar Visual
+# 13. Personalizar Visual
 
 No painel:
 

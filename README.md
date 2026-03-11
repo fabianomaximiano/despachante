@@ -77,6 +77,7 @@ Cada serviço possui:
 - título
 - descrição
 - ícone FontAwesome
+- checklist de documentos
 
 Exemplo de serviços:
 
@@ -238,12 +239,111 @@ Campos:
 
 - nome
 - WhatsApp
+- e-mail
 - serviço desejado
+- objetivo do atendimento
+- mensagem
 - upload de documentos
+- checklist por serviço
+- consentimento LGPD
 
 O envio é tratado via JavaScript:
 
 assets/js/handlePreAnalise.js
+
+---
+
+# Sistema de leads
+
+O sistema grava no banco de dados:
+
+- nome
+- WhatsApp
+- e-mail
+- serviço solicitado
+- objetivo do atendimento
+- mensagem
+- status
+- data do envio
+- IP
+- user agent
+- consentimento LGPD
+
+Também grava:
+
+- arquivos enviados
+- links de acesso
+- identificação de documentos do checklist
+
+---
+
+# Painel administrativo de leads
+
+O projeto possui painel administrativo próprio no WordPress para:
+
+- visualizar leads recebidos
+- abrir detalhes de cada lead
+- ver checklist esperado
+- conferir documentos enviados
+- baixar ou abrir arquivos
+
+---
+
+# Sistema de envio de e-mails
+
+O tema envia notificações automáticas para o escritório quando um lead é enviado.
+
+Os e-mails podem conter:
+
+- nome
+- e-mail
+- WhatsApp
+- serviço solicitado
+- objetivo do atendimento
+- mensagem
+- links dos documentos enviados
+
+Para funcionamento correto é necessário instalar:
+
+WP Mail SMTP
+
+Plugin oficial:
+
+https://wordpress.org/plugins/wp-mail-smtp/
+
+---
+
+# Como ativar envio de e-mails
+
+### 1 Instale o plugin SMTP
+
+No painel:
+
+Plugins → Adicionar novo
+
+Pesquise por:
+
+WP Mail SMTP
+
+Instale e ative.
+
+---
+
+### 2 Configure o SMTP
+
+No painel:
+
+WP Mail SMTP → Settings
+
+Exemplo com Gmail:
+
+- SMTP Host: smtp.gmail.com
+- Porta: 587
+- Criptografia: TLS
+- Usuário: seuemail@gmail.com
+- Senha: senha de aplicativo
+
+Depois execute o teste de envio do plugin.
 
 ---
 

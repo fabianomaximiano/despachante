@@ -115,7 +115,58 @@ Instale e ative.
 
 ---
 
-# Passo 5 — Configurar Avaliações
+# Passo 5 — Instalar Plugin de SMTP
+
+Para garantir o envio correto dos e-mails do formulário, instale:
+
+WP Mail SMTP
+
+Link:
+
+https://wordpress.org/plugins/wp-mail-smtp/
+
+No painel:
+
+Plugins → Adicionar novo
+
+Procure por:
+
+WP Mail SMTP
+
+Instale e ative.
+
+---
+
+# Passo 6 — Configurar SMTP
+
+No painel:
+
+WP Mail SMTP → Settings
+
+Configure com o e-mail do domínio ou outro provedor SMTP.
+
+Exemplo usando Gmail:
+
+- SMTP Host: smtp.gmail.com
+- Porta: 587
+- Criptografia: TLS
+- Autenticação: ativada
+- Usuário: seuemail@gmail.com
+- Senha: senha de aplicativo
+
+Exemplo usando e-mail do domínio na hospedagem:
+
+- SMTP Host: conforme provedor do e-mail
+- Porta: 465 ou 587
+- Criptografia: SSL/TLS ou TLS
+- Usuário: email@seudominio.com
+- Senha: senha da conta de e-mail
+
+Depois faça um teste de envio no plugin.
+
+---
+
+# Passo 7 — Configurar Avaliações
 
 No painel:
 
@@ -131,7 +182,7 @@ Exemplo:
 
 ---
 
-# Passo 6 — Inserir Shortcode no Tema
+# Passo 8 — Inserir Shortcode no Tema
 
 No painel:
 
@@ -145,7 +196,7 @@ Exemplo:
 
 ---
 
-# Passo 7 — Configurar Hero
+# Passo 9 — Configurar Hero
 
 No painel:
 
@@ -175,7 +226,7 @@ Link
 
 ---
 
-# Passo 8 — Cadastrar Serviços
+# Passo 10 — Cadastrar Serviços
 
 No painel:
 
@@ -186,6 +237,7 @@ Informe:
 - título
 - descrição
 - ícone FontAwesome
+- checklist de documentos
 
 Exemplos de ícones:
 
@@ -198,7 +250,7 @@ fas fa-cogs
 
 ---
 
-# Passo 9 — Cadastrar FAQ
+# Passo 11 — Cadastrar FAQ
 
 No painel:
 
@@ -213,7 +265,19 @@ Essas perguntas aparecerão automaticamente na landing.
 
 ---
 
-# Passo 10 — Testar Landing Page
+# Passo 12 — Configurar e-mail do escritório
+
+No painel:
+
+Aparência → Personalizar → Rodapé
+
+Preencha o campo de e-mail do escritório.
+
+Esse e-mail será usado como destinatário das notificações de leads.
+
+---
+
+# Passo 13 — Testar Landing Page
 
 Acesse a página inicial do site.
 
@@ -225,7 +289,13 @@ Verifique:
 - FAQ
 - formulário de pré-análise
 
-Teste o envio do formulário.
+Teste:
+
+- envio do formulário
+- validação dos campos
+- recebimento do e-mail
+- salvamento dos leads
+- abertura dos arquivos enviados
 
 ---
 
@@ -313,3 +383,5 @@ A landing page estará configurada para:
 - captar leads
 - exibir avaliações reais do Google
 - responder dúvidas via FAQ
+- receber documentos
+- enviar notificações por e-mail

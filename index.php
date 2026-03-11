@@ -142,23 +142,23 @@ if ($services_hover_effect === 'glow') {
         <div class="card shadow-sm border-0 mx-auto p-4 p-md-5" style="max-width: 820px; border-radius: 15px;">
             <h3 class="text-center font-weight-bold mb-4">Inicie sua Pré-Análise</h3>
 
-            <form id="formPreAnalise" enctype="multipart/form-data">
+            <form id="formPreAnalise" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="action" value="despachante_pre_analise_submit">
                 <input type="hidden" name="nonce" value="<?php echo esc_attr(wp_create_nonce('despachante_pre_analise_nonce')); ?>">
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">Nome completo</label>
-                    <input type="text" name="nome" class="form-control custom-input" required>
+                    <input type="text" name="nome" class="form-control custom-input" autocomplete="name" required>
                 </div>
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">WhatsApp</label>
-                    <input type="text" name="telefone" class="form-control custom-input" required>
+                    <input type="text" name="telefone" class="form-control custom-input" autocomplete="tel" maxlength="15" required>
                 </div>
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">E-mail</label>
-                    <input type="email" name="email" class="form-control custom-input" placeholder="opcional">
+                    <input type="email" name="email" class="form-control custom-input" autocomplete="email" required>
                 </div>
 
                 <div class="form-group mb-4">
@@ -191,7 +191,7 @@ if ($services_hover_effect === 'glow') {
                 </div>
 
                 <div class="form-group mb-4">
-                    <label class="font-weight-bold">Checklist de documentos</label>
+                    <label class="font-weight-bold">Checklist de documentos obrigatórios</label>
                     <div id="serviceDocumentsChecklist" class="documents-checklist">
                         <div class="documents-checklist__empty text-muted">
                             Selecione um serviço para exibir os documentos necessários.

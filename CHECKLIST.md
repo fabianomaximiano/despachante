@@ -126,25 +126,25 @@ Use as caixas de seleção para marcar os itens concluídos.
 
 ---
 
-# Funcionalidades Pendentes
+# Funcionalidades do Formulário
 
 ## Formulário
 
-- [ ] Processamento real do envio
-- [ ] Validação de campos
-- [ ] Proteção nonce
-- [ ] Mensagem de sucesso
-- [ ] Mensagem de erro
-- [ ] Gravação segura dos dados enviados
+- [x] Processamento real do envio
+- [x] Validação de campos
+- [x] Proteção nonce
+- [x] Mensagem de sucesso
+- [x] Mensagem de erro
+- [x] Gravação segura dos dados enviados
 
 ---
 
 ## Checklist de Documentos
 
-- [ ] Criar checklist de documentos
-- [ ] Upload separado por documento
-- [ ] Mostrar documentos necessários por serviço
-- [ ] Interface de checklist amigável
+- [x] Criar checklist de documentos
+- [x] Upload separado por documento
+- [x] Mostrar documentos necessários por serviço
+- [x] Interface de checklist amigável
 
 Exemplo de documentos:
 
@@ -161,40 +161,45 @@ Exemplo de documentos:
 
 ## Upload de Arquivos
 
-- [ ] Upload funcional no servidor
-- [ ] Validação de tipo de arquivo
-- [ ] Limite de tamanho
-- [ ] Salvamento em diretório organizado
-- [ ] Geração de links para download dos arquivos
+- [x] Upload funcional no servidor
+- [x] Validação de tipo de arquivo
+- [x] Limite de tamanho
+- [x] Salvamento em diretório organizado
+- [x] Geração de links para download dos arquivos
 
 ---
 
 ## Banco de Dados / Leads
 
-- [ ] Criar sistema de leads
-- [ ] Salvar dados do formulário
-- [ ] Salvar serviço solicitado
-- [ ] Salvar links dos arquivos
-- [ ] Salvar data do envio
-- [ ] Salvar consentimento LGPD
+- [x] Criar sistema de leads
+- [x] Salvar dados do formulário
+- [x] Salvar serviço solicitado
+- [x] Salvar links dos arquivos
+- [x] Salvar data do envio
+- [x] Salvar consentimento LGPD
 
 ---
 
 ## Painel Administrativo de Leads
 
-- [ ] Criar CPT ou tabela para solicitações
-- [ ] Visualizar dados enviados
-- [ ] Baixar documentos enviados
+- [x] Criar CPT ou tabela para solicitações
+- [x] Visualizar dados enviados
+- [x] Baixar documentos enviados
 - [ ] Filtrar solicitações
 
 ---
 
 ## Envio de Email
 
-- [ ] Enviar dados do cliente por email
-- [ ] Enviar serviço solicitado
-- [ ] Enviar documentos anexados ou links
-- [ ] Configurar email do despachante
+- [x] Enviar dados do cliente por email
+- [x] Enviar serviço solicitado
+- [x] Enviar documentos anexados ou links
+- [x] Configurar email do despachante
+
+### Dependência recomendada
+
+- [x] Instalar plugin SMTP no WordPress
+- [x] Plugin recomendado: WP Mail SMTP
 
 ---
 
@@ -204,7 +209,7 @@ Exemplo de documentos:
 - [ ] Exibir no primeiro acesso
 - [ ] Registrar consentimento
 - [ ] Expiração de consentimento (15 dias)
-- [ ] Bloquear envio sem consentimento
+- [x] Bloquear envio sem consentimento
 
 ---
 
@@ -222,7 +227,7 @@ Exemplo de documentos:
 
 # Melhorias Futuras
 
-- [ ] Melhorar UI do formulário
+- [x] Melhorar UI do formulário
 - [ ] Etapas no formulário (wizard)
 - [ ] Painel de estatísticas de leads
 - [ ] Integração com CRM
@@ -232,5 +237,5 @@ Exemplo de documentos:
 
 # Status do Projeto
 
-Versão atual: 3.0.5  
-Estado: Em desenvolvimento
+Versão atual: 3.3.7  
+Estado: Em desenvolvimento avançado
