@@ -105,24 +105,18 @@ Use as caixas de seleção para marcar os itens concluídos.
 
 ---
 
-# Documentação
-
-- [x] README.md
-- [x] INSTALL.md
-- [x] CHANGELOG.md
-- [x] DEPLOY.md
-- [x] .gitignore
-- [x] CHECKLIST.md
-
----
-
 # Formulário de Pré-Análise
 
 - [x] Layout do formulário criado
 - [x] Campo nome
 - [x] Campo WhatsApp
+- [x] Campo e-mail
 - [x] Campo seleção de serviço
-- [x] Campo de upload de documentos (visual)
+- [x] Campo objetivo do atendimento
+- [x] Campo mensagem
+- [x] Campo de upload de documentos
+- [x] Campo de documentos extras
+- [x] Campo de consentimento LGPD
 
 ---
 
@@ -131,10 +125,14 @@ Use as caixas de seleção para marcar os itens concluídos.
 ## Formulário
 
 - [x] Processamento real do envio
-- [x] Validação de campos
+- [x] Validação de campos no frontend
+- [x] Validação de campos no backend
+- [x] Validação de WhatsApp
+- [x] Validação de e-mail
 - [x] Proteção nonce
 - [x] Mensagem de sucesso
 - [x] Mensagem de erro
+- [x] Exibição de erros por campo
 - [x] Gravação segura dos dados enviados
 
 ---
@@ -145,6 +143,8 @@ Use as caixas de seleção para marcar os itens concluídos.
 - [x] Upload separado por documento
 - [x] Mostrar documentos necessários por serviço
 - [x] Interface de checklist amigável
+- [x] Checklist configurável por serviço no painel
+- [x] Validação de checklist obrigatório
 
 Exemplo de documentos:
 
@@ -166,35 +166,56 @@ Exemplo de documentos:
 - [x] Limite de tamanho
 - [x] Salvamento em diretório organizado
 - [x] Geração de links para download dos arquivos
+- [x] Correção de URL pública para ambiente local/Docker
 
 ---
 
 ## Banco de Dados / Leads
 
 - [x] Criar sistema de leads
+- [x] Criar tabela de leads
+- [x] Criar tabela de arquivos enviados
 - [x] Salvar dados do formulário
 - [x] Salvar serviço solicitado
+- [x] Salvar objetivo do atendimento
 - [x] Salvar links dos arquivos
 - [x] Salvar data do envio
 - [x] Salvar consentimento LGPD
+- [x] Salvar IP
+- [x] Salvar user agent
+- [x] Controle de versão do banco
 
 ---
 
 ## Painel Administrativo de Leads
 
-- [x] Criar CPT ou tabela para solicitações
+- [x] Criar área administrativa de leads
 - [x] Visualizar dados enviados
+- [x] Visualizar checklist esperado
+- [x] Visualizar arquivos enviados
 - [x] Baixar documentos enviados
+- [x] Manter layout atual do painel
 - [ ] Filtrar solicitações
 
 ---
 
 ## Envio de Email
 
-- [x] Enviar dados do cliente por email
+- [x] Enviar dados do cliente por e-mail
 - [x] Enviar serviço solicitado
+- [x] Enviar objetivo do atendimento
+- [x] Enviar mensagem do cliente
 - [x] Enviar documentos anexados ou links
-- [x] Configurar email do despachante
+- [x] Enviar link do painel administrativo
+- [x] Configurar e-mail do despachante
+- [x] Template HTML de e-mail
+- [x] Assunto dinâmico por tipo de atendimento
+- [x] Envio de confirmação para o cliente
+- [x] Identidade visual de e-mail via painel
+- [x] Logo no e-mail
+- [x] Nome da empresa no e-mail
+- [x] Cor principal do e-mail
+- [x] Texto de rodapé do e-mail
 
 ### Dependência recomendada
 
@@ -225,6 +246,39 @@ Exemplo de documentos:
 
 ---
 
+# Refatoração / Organização do Projeto
+
+- [x] Reduzir tamanho do functions.php
+- [x] Modularizar helpers.php
+- [x] Modularizar setup.php
+- [x] Modularizar database.php
+- [x] Modularizar customizer.php
+- [x] Modularizar cpts.php
+- [x] Modularizar metaboxes.php
+- [x] Modularizar uploads.php
+- [x] Modularizar email.php
+- [x] Modularizar form-handler.php
+- [x] Modularizar admin-leads.php
+- [x] Modularizar dynamic-css.php
+- [x] Criar functions.php enxuto como loader dos módulos
+
+---
+
+# Documentação
+
+- [x] README.md
+- [x] INSTALL.md
+- [x] INSTALACAO.md
+- [x] CHANGELOG.md
+- [x] DEPLOY.md
+- [x] .gitignore
+- [x] CHECKLIST.md
+- [x] Atualizar documentação com WP Mail SMTP
+- [x] Atualizar documentação do fluxo de e-mails
+- [x] Atualizar checklist com estado real do projeto
+
+---
+
 # Melhorias Futuras
 
 - [x] Melhorar UI do formulário
@@ -235,7 +289,33 @@ Exemplo de documentos:
 
 ---
 
+# Melhoria Final Proposta
+
+## Mini CRM de Leads
+
+Objetivo:
+Transformar o sistema de leads em uma estrutura mais completa de atendimento interno para o escritório.
+
+### Ideias para a evolução final
+
+- [ ] Adicionar status do lead
+- [ ] Status: novo
+- [ ] Status: em análise
+- [ ] Status: aguardando documentos
+- [ ] Status: processo iniciado
+- [ ] Status: concluído
+- [ ] Permitir atualização manual do status no painel
+- [ ] Exibir histórico básico do andamento do lead
+- [ ] Permitir observações internas do escritório
+- [ ] Exportar leads em CSV
+
+Observação:
+Essa melhoria não é obrigatória para concluir o projeto atual, mas será a próxima evolução natural para transformar a landing page em um mini CRM de atendimento para despachantes.
+
+---
+
 # Status do Projeto
 
 Versão atual: 3.3.7  
-Estado: Em desenvolvimento avançado
+Estado: Estrutura principal concluída e funcional  
+Próximo foco: acabamento final e validação completa do fluxo

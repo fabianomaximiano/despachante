@@ -3,14 +3,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const feedback = document.getElementById('formFeedback');
     const submitButton = document.getElementById('submitPreAnalise');
     const servicoSelect = document.getElementById('servicoSelect');
+    const tipoClienteSelect = document.getElementById('tipoClienteSelect');
+    const objetivoAtendimentoSelect = document.getElementById('objetivoAtendimentoSelect');
+    const checklistWrapper = document.getElementById('checklistDocumentsWrapper');
+    const checklistDescription = document.getElementById('checklistDocumentsDescription');
     const checklistContainer = document.getElementById('serviceDocumentsChecklist');
+    const extraDocumentsWrapper = document.getElementById('extraDocumentsWrapper');
     const extraFilesInput = document.getElementById('extraFilesInput');
     const selectedExtraFiles = document.getElementById('selectedExtraFiles');
     const telefoneInput = form ? form.querySelector('input[name="telefone"]') : null;
-    const emailInput = form ? form.querySelector('input[name="email"]') : null;
-    const nomeInput = form ? form.querySelector('input[name="nome"]') : null;
-    const objetivoInput = form ? form.querySelector('select[name="objetivo_atendimento"]') : null;
-    const mensagemInput = form ? form.querySelector('textarea[name="mensagem"]') : null;
 
     if (!form) {
         return;
@@ -27,59 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function clearFeedback() {
         if (!feedback) return;
         feedback.innerHTML = '';
-    }
-
-    function ensureFieldErrorElement(field) {
-        if (!field) return null;
-
-        let errorEl = field.parentNode.querySelector('.field-error-message');
-
-        if (!errorEl) {
-            errorEl = document.createElement('div');
-            errorEl.className = 'field-error-message text-danger small mt-2';
-            errorEl.style.display = 'none';
-            field.parentNode.appendChild(errorEl);
-        }
-
-        return errorEl;
-    }
-
-    function showFieldError(field, message) {
-        if (!field) return;
-
-        field.style.borderColor = '#dc3545';
-        field.style.boxShadow = '0 0 0 0.2rem rgba(220,53,69,0.15)';
-
-        const errorEl = ensureFieldErrorElement(field);
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
-    }
-
-    function clearFieldError(field) {
-        if (!field) return;
-
-        field.style.borderColor = '';
-        field.style.boxShadow = '';
-
-        const errorEl = ensureFieldErrorElement(field);
-        if (errorEl) {
-            errorEl.textContent = '';
-            errorEl.style.display = 'none';
-        }
-    }
-
-    function scrollToField(field) {
-        if (!field) return;
-        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        field.focus();
-    }
-
-    function clearAllFieldErrors() {
-        [nomeInput, telefoneInput, emailInput, servicoSelect, objetivoInput, mensagemInput].forEach(function (field) {
-            clearFieldError(field);
-        });
     }
 
     function renderSelectedFiles(target, files) {
@@ -110,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function onlyDigits(value) {
-        return String(value || '').replace(/\D/g, '');
+        return (value || '').replace(/\D+/g, '');
     }
 
     function applyPhoneMask(value) {
@@ -131,41 +79,128 @@ document.addEventListener('DOMContentLoaded', function () {
         return '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 7) + '-' + digits.slice(7);
     }
 
-    function isValidPhone(value) {
-        const digits = onlyDigits(value);
-        return digits.length >= 10 && digits.length <= 11;
+    function setupPhoneMask() {
+        if (!telefoneInput) return;
+
+        telefoneInput.addEventListener('input', function () {
+            this.value = applyPhoneMask(this.value);
+        });
+
+        telefoneInput.addEventListener('blur', function () {
+            this.value = applyPhoneMask(this.value);
+        });
     }
 
-    function isValidEmail(value) {
-        const email = String(value || '').trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-        return emailRegex.test(email);
+    function getTipoCliente() {
+        return tipoClienteSelect ? tipoClienteSelect.value : 'pf';
     }
 
-    function clearChecklistErrors() {
-        if (!checklistContainer) return;
+    function getObjetivoAtendimento() {
+        return objetivoAtendimentoSelect ? objetivoAtendimentoSelect.value : '';
+    }
 
-        const items = checklistContainer.querySelectorAll('.document-item');
+    function mustShowDocumentsSection() {
+        return getObjetivoAtendimento() === 'enviar_documentos';
+    }
 
-        items.forEach(function (item) {
-            item.classList.remove('document-item--error');
-            item.style.border = '';
-            item.style.background = '';
+    function getPfDocuments(serviceId) {
+        return serviceDocs[serviceId] || [];
+    }
 
-            const errorBox = item.querySelector('.document-item__error');
-            if (errorBox) {
-                errorBox.style.display = 'none';
-                errorBox.innerText = '';
+    function getPjDocuments(serviceId) {
+        const pfDocs = getPfDocuments(serviceId);
+
+        if (!pfDocs.length) {
+            return [
+                'CNPJ',
+                'Contrato social',
+                'Documento do responsável',
+                'CRLV',
+                'Comprovante de pagamento',
+                'Procuração'
+            ];
+        }
+
+        const mapped = [];
+        const seen = new Set();
+
+        pfDocs.forEach(function (doc) {
+            const normalized = (doc || '').toString().trim().toLowerCase();
+            let replacement = doc;
+
+            if (normalized === 'cpf') {
+                replacement = 'CNPJ';
+            } else if (normalized === 'rg') {
+                replacement = 'Contrato social';
+            } else if (normalized === 'cnh') {
+                replacement = 'Documento do responsável';
+            } else if (normalized === 'comprovante de residência') {
+                replacement = 'Documento do responsável';
+            }
+
+            const key = replacement.toLowerCase();
+            if (!seen.has(key)) {
+                seen.add(key);
+                mapped.push(replacement);
             }
         });
+
+        if (!seen.has('cnpj')) {
+            mapped.unshift('CNPJ');
+        }
+
+        if (!seen.has('contrato social')) {
+            mapped.push('Contrato social');
+        }
+
+        if (!seen.has('documento do responsável')) {
+            mapped.push('Documento do responsável');
+        }
+
+        return Array.from(new Set(mapped));
+    }
+
+    function getDocumentsForCurrentSelection(serviceId) {
+        if (!serviceId) {
+            return [];
+        }
+
+        return getTipoCliente() === 'pj'
+            ? getPjDocuments(serviceId)
+            : getPfDocuments(serviceId);
+    }
+
+    function updateDocumentsVisibility() {
+        const shouldShow = mustShowDocumentsSection();
+
+        if (checklistWrapper) {
+            checklistWrapper.style.display = shouldShow ? 'block' : 'none';
+        }
+
+        if (extraDocumentsWrapper) {
+            extraDocumentsWrapper.style.display = shouldShow ? 'block' : 'none';
+        }
+
+        if (!shouldShow && checklistContainer) {
+            checklistContainer.innerHTML = '<div class="documents-checklist__empty text-muted">Os documentos só precisam ser enviados quando o objetivo for "Quero enviar documentos para análise".</div>';
+        }
+
+        if (checklistDescription) {
+            checklistDescription.textContent = shouldShow
+                ? 'Selecione um serviço e envie os documentos necessários para análise.'
+                : 'Os documentos serão solicitados apenas quando você escolher a opção de envio para análise.';
+        }
     }
 
     function renderChecklist(serviceId) {
         if (!checklistContainer) return;
 
-        clearChecklistErrors();
+        if (!mustShowDocumentsSection()) {
+            updateDocumentsVisibility();
+            return;
+        }
 
-        const docs = serviceDocs[serviceId] || [];
+        const docs = getDocumentsForCurrentSelection(serviceId);
 
         if (!serviceId) {
             checklistContainer.innerHTML = '<div class="documents-checklist__empty text-muted">' + (messages.select_service || 'Selecione um serviço.') + '</div>';
@@ -183,15 +218,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const slug = slugify(doc || ('documento_' + index));
 
             html += ''
-                + '<div class="document-item" data-doc-slug="' + slug + '">'
+                + '<div class="document-item">'
                 +   '<div class="document-item__header">'
-                +       '<span class="document-item__label">' + doc + ' <span style="color:#a00;">*</span></span>'
+                +       '<span class="document-item__label">' + doc + '</span>'
                 +   '</div>'
-                +   '<input type="hidden" name="document_labels[' + slug + ']" value="' + String(doc).replace(/"/g, '&quot;') + '">'
+                +   '<input type="hidden" name="document_labels[' + slug + ']" value="' + doc.replace(/"/g, '&quot;') + '">'
                 +   '<div class="document-item__body">'
-                +       '<input type="file" name="documentos_checklist[' + slug + ']" class="form-control-file documento-checklist-input" data-label="' + String(doc).replace(/"/g, '&quot;') + '" accept=".jpg,.jpeg,.png,.pdf">'
+                +       '<input type="file" name="documentos_checklist[' + slug + ']" class="form-control-file" accept=".jpg,.jpeg,.png,.pdf">'
                 +       '<small class="text-muted d-block mt-2">Envie ' + doc + ' em JPG, PNG ou PDF.</small>'
-                +       '<div class="document-item__error text-danger small mt-2" style="display:none;"></div>'
                 +   '</div>'
                 + '</div>';
         });
@@ -200,162 +234,50 @@ document.addEventListener('DOMContentLoaded', function () {
         checklistContainer.innerHTML = html;
     }
 
-    function validateChecklistFiles() {
-        if (!checklistContainer) {
-            return true;
-        }
-
-        clearChecklistErrors();
-
-        const inputs = checklistContainer.querySelectorAll('.documento-checklist-input');
-
-        if (!inputs.length) {
-            return true;
-        }
-
-        let firstInvalidItem = null;
-        const missingDocs = [];
-
-        inputs.forEach(function (input) {
-            if (!input.files || !input.files.length) {
-                const label = input.getAttribute('data-label') || 'Documento obrigatório';
-                missingDocs.push(label);
-
-                const item = input.closest('.document-item');
-                if (item) {
-                    if (!firstInvalidItem) {
-                        firstInvalidItem = item;
-                    }
-
-                    item.classList.add('document-item--error');
-                    item.style.border = '1px solid #dc3545';
-                    item.style.background = '#fff5f5';
-
-                    const errorBox = item.querySelector('.document-item__error');
-                    if (errorBox) {
-                        errorBox.innerText = 'Este documento é obrigatório.';
-                        errorBox.style.display = 'block';
-                    }
-                }
-            }
-        });
-
-        if (missingDocs.length) {
-            if (firstInvalidItem) {
-                firstInvalidItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            return false;
-        }
-
-        return true;
+    function refreshDocumentsArea() {
+        updateDocumentsVisibility();
+        renderChecklist(servicoSelect ? servicoSelect.value : '');
     }
 
-    function validateFormFields() {
-        clearAllFieldErrors();
-        clearFeedback();
+    function resetFormState() {
+        form.reset();
 
-        const nome = nomeInput ? nomeInput.value.trim() : '';
-        const telefone = telefoneInput ? telefoneInput.value.trim() : '';
-        const email = emailInput ? emailInput.value.trim() : '';
-        const servico = servicoSelect ? servicoSelect.value : '';
-
-        if (!nome) {
-            showFieldError(nomeInput, 'Informe seu nome.');
-            scrollToField(nomeInput);
-            return false;
+        if (tipoClienteSelect) {
+            tipoClienteSelect.value = 'pf';
         }
 
-        if (!telefone) {
-            showFieldError(telefoneInput, 'Informe seu WhatsApp.');
-            scrollToField(telefoneInput);
-            return false;
+        if (objetivoAtendimentoSelect) {
+            objetivoAtendimentoSelect.value = '';
         }
 
-        if (!isValidPhone(telefone)) {
-            showFieldError(telefoneInput, 'Informe um WhatsApp válido com DDD.');
-            scrollToField(telefoneInput);
-            return false;
+        if (servicoSelect) {
+            servicoSelect.value = '';
         }
 
-        if (!email) {
-            showFieldError(emailInput, 'Informe seu e-mail.');
-            scrollToField(emailInput);
-            return false;
+        if (telefoneInput) {
+            telefoneInput.value = '';
         }
 
-        if (!isValidEmail(email)) {
-            showFieldError(emailInput, 'Informe um e-mail válido.');
-            scrollToField(emailInput);
-            return false;
-        }
-
-        if (!servico) {
-            showFieldError(servicoSelect, 'Selecione um serviço.');
-            scrollToField(servicoSelect);
-            return false;
-        }
-
-        if (!validateChecklistFiles()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    if (telefoneInput) {
-        telefoneInput.setAttribute('inputmode', 'numeric');
-        telefoneInput.setAttribute('autocomplete', 'tel');
-        telefoneInput.setAttribute('placeholder', '(11) 99999-9999');
-
-        telefoneInput.addEventListener('input', function () {
-            this.value = applyPhoneMask(this.value);
-            clearFieldError(this);
-        });
-
-        telefoneInput.addEventListener('blur', function () {
-            this.value = applyPhoneMask(this.value);
-        });
-    }
-
-    if (emailInput) {
-        emailInput.setAttribute('autocomplete', 'email');
-        emailInput.setAttribute('placeholder', 'seuemail@dominio.com');
-
-        emailInput.addEventListener('input', function () {
-            clearFieldError(this);
-        });
-
-        emailInput.addEventListener('blur', function () {
-            const value = this.value.trim();
-
-            if (!value) {
-                showFieldError(this, 'Informe seu e-mail.');
-                return;
-            }
-
-            if (!isValidEmail(value)) {
-                showFieldError(this, 'Informe um e-mail válido.');
-            } else {
-                clearFieldError(this);
-            }
-        });
-    }
-
-    if (nomeInput) {
-        nomeInput.addEventListener('input', function () {
-            clearFieldError(this);
-        });
+        renderSelectedFiles(selectedExtraFiles, []);
+        refreshDocumentsArea();
     }
 
     if (servicoSelect) {
         servicoSelect.addEventListener('change', function () {
-            clearFieldError(this);
             renderChecklist(this.value);
         });
+    }
 
-        if (servicoSelect.value) {
-            renderChecklist(servicoSelect.value);
-        }
+    if (tipoClienteSelect) {
+        tipoClienteSelect.addEventListener('change', function () {
+            renderChecklist(servicoSelect ? servicoSelect.value : '');
+        });
+    }
+
+    if (objetivoAtendimentoSelect) {
+        objetivoAtendimentoSelect.addEventListener('change', function () {
+            refreshDocumentsArea();
+        });
     }
 
     if (extraFilesInput) {
@@ -364,15 +286,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    setupPhoneMask();
+    refreshDocumentsArea();
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
+        clearFeedback();
 
         if (!window.wp_ajax_obj || !wp_ajax_obj.ajax_url) {
             showFeedback('Configuração AJAX não encontrada.', 'danger');
-            return;
-        }
-
-        if (!validateFormFields()) {
             return;
         }
 
@@ -392,13 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
             credentials: 'same-origin'
         })
             .then(async function (response) {
-                let data = null;
-
-                try {
-                    data = await response.json();
-                } catch (e) {
-                    throw new Error('Resposta inválida do servidor.');
-                }
+                const data = await response.json();
 
                 if (!response.ok || !data.success) {
                     throw new Error(
@@ -411,12 +327,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return data;
             })
             .then(function (data) {
-                clearAllFieldErrors();
-                clearChecklistErrors();
+                resetFormState();
                 showFeedback(data.data.message || 'Solicitação enviada com sucesso.', 'success');
-                form.reset();
-                renderSelectedFiles(selectedExtraFiles, []);
-                renderChecklist('');
             })
             .catch(function (error) {
                 showFeedback(error.message || 'Erro ao enviar formulário.', 'danger');

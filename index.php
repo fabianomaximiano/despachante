@@ -6,18 +6,18 @@ $hero_bg = get_theme_mod(
     'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1920&q=80'
 );
 
-$hero_title       = get_theme_mod('hero_title', 'Despachante Digital Flow');
-$hero_subtitle    = get_theme_mod('hero_subtitle', 'Agilidade, segurança e atendimento profissional para regularização de veículos.');
-$hero_button_text = get_theme_mod('hero_button_text', 'Começar Agora');
-$hero_button_link = get_theme_mod('hero_button_link', '#pre-analise');
-
-$services_icon_shape   = get_theme_mod('services_icon_shape', 'rounded-square');
-$services_hover_effect = get_theme_mod('services_hover_effect', 'lift');
+$hero_title             = get_theme_mod('hero_title', 'Despachante Digital Flow');
+$hero_subtitle          = get_theme_mod('hero_subtitle', 'Agilidade, segurança e atendimento profissional para regularização de veículos.');
+$hero_button_text       = get_theme_mod('hero_button_text', 'Começar Agora');
+$hero_button_link       = get_theme_mod('hero_button_link', '#pre-analise');
+$services_icon_shape    = get_theme_mod('services_icon_shape', 'rounded-square');
+$services_hover_effect  = get_theme_mod('services_hover_effect', 'lift');
 $google_reviews_shortcode = get_theme_mod('google_reviews_shortcode', '[wp-review-slider]');
 
 $icon_shape_class = ($services_icon_shape === 'circle')
     ? 'service-icon-box--circle'
     : 'service-icon-box--rounded-square';
+
 $hover_effect_class = 'service-card--lift';
 
 if ($services_hover_effect === 'glow') {
@@ -142,28 +142,36 @@ if ($services_hover_effect === 'glow') {
         <div class="card shadow-sm border-0 mx-auto p-4 p-md-5" style="max-width: 820px; border-radius: 15px;">
             <h3 class="text-center font-weight-bold mb-4">Inicie sua Pré-Análise</h3>
 
-            <form id="formPreAnalise" enctype="multipart/form-data" novalidate>
+            <form id="formPreAnalise" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="despachante_pre_analise_submit">
                 <input type="hidden" name="nonce" value="<?php echo esc_attr(wp_create_nonce('despachante_pre_analise_nonce')); ?>">
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">Nome completo</label>
-                    <input type="text" name="nome" class="form-control custom-input" autocomplete="name" required>
+                    <input type="text" name="nome" class="form-control custom-input" required>
                 </div>
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">WhatsApp</label>
-                    <input type="text" name="telefone" class="form-control custom-input" autocomplete="tel" maxlength="15" required>
+                    <input type="text" name="telefone" class="form-control custom-input" placeholder="(11) 99999-9999" required>
                 </div>
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">E-mail</label>
-                    <input type="email" name="email" class="form-control custom-input" autocomplete="email" required>
+                    <input type="email" name="email" class="form-control custom-input" placeholder="seuemail@dominio.com" required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Tipo de cliente</label>
+                    <select name="tipo_cliente" id="tipoClienteSelect" class="form-control custom-input" required>
+                        <option value="pf">Pessoa física</option>
+                        <option value="pj">Pessoa jurídica</option>
+                    </select>
                 </div>
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">Objetivo do atendimento</label>
-                    <select name="objetivo_atendimento" class="form-control custom-input">
+                    <select name="objetivo_atendimento" id="objetivoAtendimentoSelect" class="form-control custom-input" required>
                         <option value="">Selecione...</option>
                         <option value="tirar_duvidas">Quero tirar dúvidas</option>
                         <option value="iniciar_processo">Quero iniciar meu processo</option>
@@ -190,8 +198,12 @@ if ($services_hover_effect === 'glow') {
                     </select>
                 </div>
 
-                <div class="form-group mb-4">
-                    <label class="font-weight-bold">Checklist de documentos obrigatórios</label>
+                <div class="form-group mb-4" id="checklistDocumentsWrapper" style="display:none;">
+                    <label class="font-weight-bold">Checklist de documentos</label>
+                    <p class="text-muted small mb-3" id="checklistDocumentsDescription">
+                        Selecione um serviço e envie os documentos necessários para análise.
+                    </p>
+
                     <div id="serviceDocumentsChecklist" class="documents-checklist">
                         <div class="documents-checklist__empty text-muted">
                             Selecione um serviço para exibir os documentos necessários.
@@ -199,7 +211,7 @@ if ($services_hover_effect === 'glow') {
                     </div>
                 </div>
 
-                <div class="form-group mb-4">
+                <div class="form-group mb-4" id="extraDocumentsWrapper" style="display:none;">
                     <label class="font-weight-bold">Documentos extras</label>
                     <div class="upload-container text-center border p-4" style="border-radius:10px;">
                         <input type="file" name="documentos_extras[]" id="extraFilesInput" class="d-none" multiple accept=".jpg,.jpeg,.png,.pdf">
@@ -214,12 +226,18 @@ if ($services_hover_effect === 'glow') {
 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold">Mensagem</label>
-                    <textarea name="mensagem" rows="4" class="form-control" style="border-radius:10px;" placeholder="Descreva sua necessidade, se quiser."></textarea>
+                    <textarea
+                        name="mensagem"
+                        rows="4"
+                        class="form-control"
+                        style="border-radius:10px;"
+                        placeholder="Exemplo: preciso regularizar um veículo, tirar uma dúvida sobre documentos ou iniciar meu processo."
+                    ></textarea>
                 </div>
 
                 <div class="form-group mb-4">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="lgpdAceito" name="lgpd_aceito" value="1">
+                        <input type="checkbox" class="custom-control-input" id="lgpdAceito" name="lgpd_aceito" value="1" required>
                         <label class="custom-control-label" for="lgpdAceito">
                             Autorizo o envio e armazenamento dos meus dados para retorno do atendimento.
                         </label>
