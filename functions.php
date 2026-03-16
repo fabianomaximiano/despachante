@@ -1,7 +1,7 @@
 <?php
 /**
  * Tema: Despachante Digital Flow
- * Versão: 3.4.0 (Otimizada para Performance & Acessibilidade)
+ * Versão: 3.4.0 (Otimizada para Performance e Acessibilidade)
  */
 
 if (!defined('ABSPATH')) {
@@ -10,14 +10,49 @@ if (!defined('ABSPATH')) {
 
 /*
 |--------------------------------------------------------------------------
-| Caminho base do tema e Requisitos
+| Caminho base do tema
 |--------------------------------------------------------------------------
 */
 if (!defined('DESPACHANTE_THEME_DIR')) {
     define('DESPACHANTE_THEME_DIR', get_template_directory());
 }
 
-// Carregamento de módulos originais do tema
+/*
+|--------------------------------------------------------------------------
+| Helpers de compatibilidade para Theme Mods
+|--------------------------------------------------------------------------
+*/
+if (!function_exists('despachante_get_theme_mod_compat')) {
+    function despachante_get_theme_mod_compat($primary, $fallbacks = array(), $default = '') {
+        $keys = array_merge(array($primary), (array) $fallbacks);
+        foreach ($keys as $key) {
+            $value = get_theme_mod($key, null);
+            if ($value !== null && $value !== '') {
+                return $value;
+            }
+        }
+        return $default;
+    }
+}
+
+if (!function_exists('despachante_get_theme_mod_bool_compat')) {
+    function despachante_get_theme_mod_bool_compat($primary, $fallbacks = array(), $default = false) {
+        $keys = array_merge(array($primary), (array) $fallbacks);
+        foreach ($keys as $key) {
+            $value = get_theme_mod($key, null);
+            if ($value !== null && $value !== '') {
+                return rest_sanitize_boolean($value);
+            }
+        }
+        return (bool) $default;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Carregar módulos do tema
+|--------------------------------------------------------------------------
+*/
 require_once DESPACHANTE_THEME_DIR . '/inc/helpers.php';
 require_once DESPACHANTE_THEME_DIR . '/inc/setup.php';
 require_once DESPACHANTE_THEME_DIR . '/inc/database.php';
@@ -35,12 +70,12 @@ require_once DESPACHANTE_THEME_DIR . '/inc/admin-ui.php';
 
 /*
 |--------------------------------------------------------------------------
-| OTIMIZAÇÕES DE PERFORMANCE (PAGESPEED)
+| OTIMIZAÇÕES DE PERFORMANCE E ACESSIBILIDADE
 |--------------------------------------------------------------------------
 */
 
 /**
- * Limpeza de scripts nativos desnecessários
+ * Limpeza de scripts nativos desnecessários para reduzir requisições
  */
 add_action('init', function() {
     remove_action('wp_head', 'print_emoji_detection_script', 7);
@@ -48,6 +83,15 @@ add_action('init', function() {
     remove_action('wp_head', 'rsd_link');
     remove_action('wp_head', 'wlwmanifest_link');
     remove_action('wp_head', 'wp_generator');
+});
+
+/**
+ * Melhora a acessibilidade garantindo que imagens tenham o atributo alt
+ */
+add_filter('the_content', function($content) {
+    return preg_replace_callback('/<img(?!.*?alt=(["\']丸).*?\/?>)/i', function($m) {
+        return str_replace('<img', '<img alt="Serviço de Despachante"', $m[0]);
+    }, $content);
 });
 
 /**
@@ -61,37 +105,10 @@ add_filter('style_loader_tag', function($tag, $handle) {
 }, 10, 2);
 
 /**
- * Adiciona DEFER aos scripts para melhorar o LCP e TBT
- */
-add_filter('script_loader_tag', function($tag, $handle) {
-    $scripts_to_defer = array('bootstrap-js', 'handle-pre-analise', 'despachante-lgpd');
-    foreach ($scripts_to_defer as $defer_script) {
-        if (strpos($handle, $defer_script) !== false) {
-            return str_replace(' src', ' defer src', $tag);
-        }
-    }
-    return $tag;
-}, 10, 2);
-
-/*
-|--------------------------------------------------------------------------
-| MELHORIAS DE ACESSIBILIDADE (A11Y)
-|--------------------------------------------------------------------------
-*/
-
-/**
- * Garante que imagens do conteúdo tenham o atributo alt, mesmo que vazio
- */
-add_filter('the_content', function($content) {
-    return preg_replace_callback('/<img(?!.*?alt=(["\']丸).*?\/?>)/i', function($m) {
-        return str_replace('<img', '<img alt="Imagem do serviço despachante"', $m[0]);
-    }, $content);
-});
-
-/**
- * Adiciona preconnect para domínios externos no head
+ * Adiciona preconnect para domínios de ativos externos
  */
 add_action('wp_head', function() {
     echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
     echo '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>' . "\n";
+    echo '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>' . "\n";
 }, 1);
