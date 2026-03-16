@@ -293,6 +293,14 @@ img {
 
 /* Footer */
 .footer-cta {
+    display: block !important;
+    width: 100%;
+    clear: both;
+    flex-shrink: 0; /* Essencial para o Firefox */
+    margin-top: auto; /* Garante que ele vá para o final se o conteúdo for pouco */
+}
+
+.footer-cta {
     background: linear-gradient(180deg, #1d2d3d 0%, #162534 100%);
     color: #ffffff;
 }
