@@ -19,7 +19,7 @@ function despachante_customize_register($wp_customize) {
 
     // Configuração para Meta Description
     $wp_customize->add_setting('seo_meta_description', array(
-        'default'           => 'Despachante Fabiano Maximiano - Especialista em regularização de veículos e CNH.',
+        'default'           => 'Sistema para Despachantes - Demonstração da plataforma de gestão e automação para regularização de veículos desenvolvida por Fabiano Maximiano.',
         'sanitize_callback' => 'sanitize_text_field'
     ));
 
