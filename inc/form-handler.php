@@ -90,21 +90,45 @@ function despachante_handle_pre_analise_submission() {
         ), 400);
     }
 
-    $must_upload_documents = ($objetivo === 'enviar_documentos');
-
-    // if ($must_upload_documents) {
-    //     $checklist_validation = despachante_validate_required_checklist_files(
-    //         $servico,
-    //         isset($_FILES['documentos_checklist']) ? $_FILES['documentos_checklist'] : array()
-    //     );
-    if ($must_upload_documents) {
-        $checklist_validation = despachante_validate_required_checklist_files(
-        $servico,
-        isset($_FILES['documentos_checklist']) ? $_FILES['documentos_checklist'] : array(),
-        $tipo_cliente
+    /*
+    |--------------------------------------------------------------------------
+    | TRAVA ANTI-DUPLICAÇÃO
+    |--------------------------------------------------------------------------
+    | Evita clique duplo, JS duplicado ou reenvio imediato do mesmo payload.
+    */
+    $submission_fingerprint = md5(
+        implode('|', array(
+            $nome,
+            $whatsapp,
+            $email,
+            (string) $servico,
+            $objetivo,
+            $tipo_cliente,
+        ))
     );
 
+    $submission_lock_key = 'despachante_submit_' . $submission_fingerprint;
+
+    if (get_transient($submission_lock_key)) {
+        wp_send_json_error(array(
+            'message' => 'Envio duplicado detectado. Aguarde alguns segundos e tente novamente.'
+        ), 429);
+    }
+
+    set_transient($submission_lock_key, 1, 15);
+
+    $must_upload_documents = ($objetivo === 'enviar_documentos');
+
+    if ($must_upload_documents) {
+        $checklist_validation = despachante_validate_required_checklist_files(
+            $servico,
+            isset($_FILES['documentos_checklist']) ? $_FILES['documentos_checklist'] : array(),
+            $tipo_cliente
+        );
+
         if (is_wp_error($checklist_validation)) {
+            delete_transient($submission_lock_key);
+
             wp_send_json_error(array(
                 'message' => $checklist_validation->get_error_message()
             ), 400);
@@ -152,6 +176,8 @@ function despachante_handle_pre_analise_submission() {
     );
 
     if (!$inserted) {
+        delete_transient($submission_lock_key);
+
         wp_send_json_error(array(
             'message' => 'Não foi possível salvar sua solicitação.'
         ), 500);
@@ -184,6 +210,8 @@ function despachante_handle_pre_analise_submission() {
             );
 
             if (is_wp_error($upload_result)) {
+                delete_transient($submission_lock_key);
+
                 wp_send_json_error(array(
                     'message' => $upload_result->get_error_message()
                 ), 400);
@@ -218,6 +246,8 @@ function despachante_handle_pre_analise_submission() {
             );
 
             if (is_wp_error($upload_result)) {
+                delete_transient($submission_lock_key);
+
                 wp_send_json_error(array(
                     'message' => $upload_result->get_error_message()
                 ), 400);

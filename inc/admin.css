@@ -1,0 +1,394 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body.toplevel_page_despachante-admin-home {
+    overflow-x: hidden;
+}
+
+body.toplevel_page_despachante-admin-home {
+    background: #f3f6fb;
+}
+
+/* WRAPPER */
+
+.toplevel_page_despachante-admin-home #wpcontent,
+.toplevel_page_despachante-admin-home #wpbody,
+.toplevel_page_despachante-admin-home #wpbody-content {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.toplevel_page_despachante-admin-home #wpbody-content {
+    padding-bottom: 24px;
+}
+
+.toplevel_page_despachante-admin-home .wrap.despachante-admin-page {
+    max-width: none !important;
+    margin: 20px 20px 0 0 !important;
+    padding: 0 !important;
+}
+
+.despachante-admin-home {
+    width: 100%;
+    padding: 0 20px;
+}
+
+/* HERO */
+
+.despachante-admin-hero {
+    width: 100%;
+    background: linear-gradient(135deg, #0f2238, #173554);
+    color: #fff;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 14px 34px rgba(15,34,56,.16);
+    margin-bottom: 24px;
+}
+
+.despachante-admin-hero h1 {
+    margin: 0 0 10px;
+    font-size: 38px;
+    font-weight: 800;
+    color: #f8fafc !important;
+    line-height: 1.15;
+}
+
+.despachante-admin-hero p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 700px;
+    color: rgba(255,255,255,0.88) !important;
+}
+
+.despachante-admin-badge {
+    display: inline-flex;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(255,255,255,.15);
+    margin-bottom: 14px;
+}
+
+.despachante-admin-hero h1 {
+    margin: 0 0 10px;
+    font-size: 38px;
+    font-weight: 800;
+}
+
+.despachante-admin-hero p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 700px;
+    color: rgba(255,255,255,.85);
+}
+
+.despachante-admin-hero__actions {
+    margin-top: 22px;
+    display: flex;
+    gap: 12px;
+}
+
+/* BUTTONS */
+
+.despachante-admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    height: 44px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .18s ease;
+}
+
+.despachante-admin-btn--primary {
+    background: #22c55e;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(34,197,94,.25);
+}
+
+.despachante-admin-btn--primary:hover {
+    transform: translateY(-1px);
+    background: #1fb556;
+}
+
+.despachante-admin-btn--ghost {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.2);
+}
+
+.despachante-admin-btn--ghost:hover {
+    background: rgba(255,255,255,.2);
+}
+
+/* MÉTRICAS */
+
+.despachante-admin-metrics {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.despachante-admin-metric {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px 22px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 6px 18px rgba(15,23,42,.05);
+    text-decoration: none;
+    position: relative;
+}
+
+.despachante-admin-metric:hover {
+    transform: translateY(-2px);
+}
+
+.despachante-admin-metric::before {
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    width:4px;
+    height:100%;
+    background:#cbd5e1;
+}
+
+.metric-blue::before {background:#2563eb;}
+.metric-purple::before {background:#7c3aed;}
+.metric-orange::before {background:#f59e0b;}
+.metric-green::before {background:#22c55e;}
+
+.despachante-admin-metric span {
+    font-size:13px;
+    color:#64748b;
+}
+
+.despachante-admin-metric strong {
+    display:block;
+    font-size:32px;
+    font-weight:800;
+    margin-top:6px;
+}
+
+/* GRID PRINCIPAL */
+
+.despachante-admin-main-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    margin-bottom:28px;
+}
+
+.despachante-admin-card {
+    display:flex;
+    gap:14px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:22px;
+    text-decoration:none;
+    box-shadow:0 6px 18px rgba(15,23,42,.05);
+}
+
+.despachante-admin-card:hover {
+    transform:translateY(-2px);
+}
+
+.despachante-admin-card__icon {
+    width:46px;
+    height:46px;
+    border-radius:10px;
+    background:#eff6ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#2563eb;
+}
+
+.despachante-admin-card__icon .dashicons {
+    font-size:22px;
+}
+
+.despachante-admin-card__content strong {
+    display:block;
+    font-size:16px;
+    margin-bottom:4px;
+    color:#0f172a;
+}
+
+.despachante-admin-card__content span {
+    font-size:14px;
+    color:#64748b;
+}
+
+/* GRID INFERIOR */
+
+.despachante-admin-grid-2 {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+/* SECTION */
+
+.despachante-admin-section {
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:24px;
+    box-shadow:0 6px 18px rgba(15,23,42,.05);
+}
+
+.despachante-admin-section__header h2 {
+    margin:0 0 6px;
+    font-size:20px;
+}
+
+.despachante-admin-section__header p {
+    margin:0 0 16px;
+    color:#64748b;
+}
+
+/* ATIVIDADE RECENTE */
+
+.despachante-admin-recent-list {
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.despachante-admin-recent-item {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    border-radius:8px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    text-decoration:none;
+}
+
+.despachante-admin-recent-item:hover {
+    background:#f1f5f9;
+}
+
+.despachante-admin-recent-item strong {
+    display:block;
+}
+
+.despachante-admin-recent-item span {
+    font-size:13px;
+    color:#64748b;
+}
+
+.despachante-admin-recent-item__meta {
+    text-align:right;
+}
+
+.despachante-admin-recent-item__meta small {
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+}
+
+.despachante-admin-empty {
+    color:#94a3b8;
+}
+
+/* PLUGINS */
+
+.despachante-admin-plugin-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.despachante-admin-plugin-card {
+    display:flex;
+    gap:12px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:18px;
+}
+
+.despachante-admin-plugin-card__icon {
+    width:42px;
+    height:42px;
+    border-radius:8px;
+    background:#fff;
+    border:1px solid #e2e8f0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#2563eb;
+}
+
+.despachante-admin-plugin-card__icon .dashicons {
+    font-size:20px;
+}
+
+.despachante-admin-plugin-card__content strong {
+    display:block;
+    margin-bottom:4px;
+}
+
+.despachante-admin-plugin-card__content span {
+    font-size:13px;
+    color:#64748b;
+}
+
+/* RESPONSIVO */
+
+@media (max-width:1400px){
+
+.despachante-admin-metrics{
+grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+@media (max-width:1100px){
+
+.despachante-admin-main-grid{
+grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+@media (max-width:900px){
+
+.despachante-admin-metrics,
+.despachante-admin-main-grid,
+.despachante-admin-grid-2,
+.despachante-admin-plugin-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+@media (max-width:782px){
+
+.despachante-admin-home{
+padding:0 12px;
+}
+
+.despachante-admin-hero{
+padding:24px;
+}
+
+.despachante-admin-hero h1{
+font-size:28px;
+}
+
+}
