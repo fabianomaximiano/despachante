@@ -1,9 +1,14 @@
-@import "scss/functions";
-@import "scss/variables";
-@import "scss/mixins";
-@import "scss/reboot";
-@import "scss/grid";
-@import "scss/utilities";
-@import "scss/buttons";
-@import "scss/forms";
-@import "scss/navbar";
+// Base obrigatória
+@import "./scss/functions";
+@import "./scss/variables";
+//@import "./scss/maps";
+@import "./scss/mixins";
+
+// Estrutura principal
+@import "./scss/reboot";
+@import "./scss/grid";
+
+// Componentes (adicione só o que usar)
+@import "./scss/buttons";
+@import "./scss/forms";
+@import "./scss/navbar";

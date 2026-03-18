@@ -133,15 +133,28 @@ add_action('wp_enqueue_scripts', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Bootstrap CSS
-    | Mantém o bootstrap.min.css completo para preservar o layout do tema.
-    | O CSS customizado poderá ser reativado depois, quando estiver validado.
+    | Bootstrap CSS enxuto
+    |--------------------------------------------------------------------------
+    | Prioridade:
+    | 1. assets/css/bootstrap-custom.min.css
+    | 2. fallback: assets/css/bootstrap.min.css
     |--------------------------------------------------------------------------
     */
+    $bootstrap_custom_rel = '/assets/css/bootstrap-custom.min.css';
     $bootstrap_default_rel = '/assets/css/bootstrap.min.css';
+
+    $bootstrap_custom_path = get_template_directory() . $bootstrap_custom_rel;
     $bootstrap_default_path = get_template_directory() . $bootstrap_default_rel;
 
-    if (file_exists($bootstrap_default_path)) {
+    if (file_exists($bootstrap_custom_path)) {
+        wp_enqueue_style(
+            'bootstrap-custom',
+            get_template_directory_uri() . $bootstrap_custom_rel,
+            array(),
+            despachante_get_asset_version($bootstrap_custom_rel, '1.0')
+        );
+        $theme_style_dependencies = array('bootstrap-custom');
+    } elseif (file_exists($bootstrap_default_path)) {
         wp_enqueue_style(
             'bootstrap-custom',
             get_template_directory_uri() . $bootstrap_default_rel,
@@ -162,7 +175,7 @@ add_action('wp_enqueue_scripts', function () {
         'theme-style',
         get_template_directory_uri() . '/assets/css/estyle.css',
         $theme_style_dependencies,
-        despachante_get_asset_version('/assets/css/estyle.css', $theme_version)
+        $theme_version
     );
 
     /*
@@ -177,7 +190,7 @@ add_action('wp_enqueue_scripts', function () {
         'theme-script',
         get_template_directory_uri() . '/assets/js/script.js',
         array('jquery'),
-        despachante_get_asset_version('/assets/js/script.js', $theme_version),
+        $theme_version,
         true
     );
 
@@ -185,7 +198,7 @@ add_action('wp_enqueue_scripts', function () {
         'lgpd-script',
         get_template_directory_uri() . '/assets/js/lgpd.js',
         array(),
-        despachante_get_asset_version('/assets/js/lgpd.js', $theme_version),
+        $theme_version,
         true
     );
 
@@ -193,7 +206,7 @@ add_action('wp_enqueue_scripts', function () {
         'pre-analise-script',
         get_template_directory_uri() . '/assets/js/handlePreAnalise.js',
         array('jquery'),
-        despachante_get_asset_version('/assets/js/handlePreAnalise.js', $theme_version),
+        $theme_version,
         true
     );
 }, 15);
