@@ -520,3 +520,13 @@ img {
         justify-content: center;
     }
 }
+
+/* =====================================
+   ACCORDION ANIMADO (FAQ)
+===================================== */
+
+.collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
