@@ -24,9 +24,6 @@
         <meta property="og:image" content="<?php echo esc_url(get_site_icon_url(1200, 630)); ?>">
     <?php endif; ?>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>

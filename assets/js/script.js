@@ -80,5 +80,5 @@ accordionButtons.forEach(button => {
         });
     }
 
-    console.log('✅ Script sem jQuery carregado com sucesso');
+    //console.log('✅ Script sem jQuery carregado com sucesso');
 });

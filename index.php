@@ -35,94 +35,32 @@ get_header();
 ?>
 
 <style>
-.hero-section {
-    position: relative;
-    overflow: hidden;
-    background: #1d2d3d;
-    min-height: 80vh;
+.hero-section--responsive-bg {
+    background-image: url('<?php echo esc_url($hero_bg_mobile); ?>');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.hero-section__media,
-.hero-section__overlay {
-    position: absolute;
-    inset: 0;
-}
-
-.hero-section__media {
-    z-index: 0;
-}
-
-.hero-section__media picture,
-.hero-section__media img {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.hero-section__media img {
-    object-fit: cover;
-    object-position: center;
-}
-
-.hero-section__overlay {
-    z-index: 1;
-    background: rgba(0, 0, 0, 0.55);
-}
-
-.hero-section__content {
-    position: relative;
-    z-index: 2;
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 96px;
-    padding-bottom: 96px;
-}
-
-@media (max-width: 767.98px) {
-    .hero-section,
-    .hero-section__content {
-        min-height: 72vh;
-    }
-
-    .hero-section__content {
-        padding-top: 72px;
-        padding-bottom: 72px;
+/* Desktop sobrescreve */
+@media (min-width: 768px) {
+    .hero-section--responsive-bg {
+        background-image: url('<?php echo esc_url($hero_bg_desktop); ?>');
     }
 }
 </style>
 
-<header id="inicio" class="hero-section">
-    <div class="hero-section__media" aria-hidden="true">
-        <picture>
-            <source
-                srcset="<?php echo esc_url($hero_bg_mobile); ?>"
-                media="(max-width: 767.98px)">
-            <img
-                src="<?php echo esc_url($hero_bg_desktop); ?>"
-                alt=""
-                width="1600"
-                height="900"
-                fetchpriority="high"
-                decoding="async">
-        </picture>
-    </div>
+<header id="inicio" class="hero-section hero-section--responsive-bg d-flex align-items-center">
+    <div class="container text-center text-white">
+        <h1 class="display-4 font-weight-bold"><?php echo esc_html($hero_title); ?></h1>
 
-    <div class="hero-section__overlay" aria-hidden="true"></div>
+        <?php if (!empty($hero_subtitle)) : ?>
+            <p class="lead mt-3 mb-4"><?php echo esc_html($hero_subtitle); ?></p>
+        <?php endif; ?>
 
-    <div class="hero-section__content">
-        <div class="container text-center text-white">
-            <h1 class="display-4 font-weight-bold"><?php echo esc_html($hero_title); ?></h1>
-
-            <?php if (!empty($hero_subtitle)) : ?>
-                <p class="lead mt-3 mb-4"><?php echo esc_html($hero_subtitle); ?></p>
-            <?php endif; ?>
-
-            <a href="<?php echo esc_url($hero_button_link); ?>" class="btn btn-success btn-lg px-5 mt-2">
-                <?php echo esc_html($hero_button_text); ?>
-            </a>
-        </div>
+        <a href="<?php echo esc_url($hero_button_link); ?>" class="btn btn-success btn-lg px-5 mt-2">
+            <?php echo esc_html($hero_button_text); ?>
+        </a>
     </div>
 </header>
 

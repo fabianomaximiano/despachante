@@ -1,7 +1,7 @@
 <?php
 /**
  * Tema: Despachante Digital Flow
- * Versão: 3.6.6
+ * Versão: 3.6.5
  */
 
 if (!defined('ABSPATH')) {
@@ -88,7 +88,7 @@ foreach ($modules as $file) {
 
 /*
 |--------------------------------------------------------------------------
-| Helpers de assets
+| HELPERS DE ASSETS
 |--------------------------------------------------------------------------
 */
 if (!function_exists('despachante_get_asset_version')) {
@@ -103,20 +103,19 @@ if (!function_exists('despachante_get_asset_version')) {
     }
 }
 
-if (!function_exists('despachante_is_front_like')) {
-    function despachante_is_front_like() {
-        return is_front_page() || is_home();
-    }
-}
-
 /*
 |--------------------------------------------------------------------------
-| Carregamento de CSS e JS
+| CARREGAMENTO DE CSS E JS
 |--------------------------------------------------------------------------
 */
 add_action('wp_enqueue_scripts', function () {
     $theme_version = wp_get_theme()->get('Version');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Limpeza de registros antigos/duplicados
+    |--------------------------------------------------------------------------
+    */
     wp_dequeue_style('bootstrap');
     wp_deregister_style('bootstrap');
 
@@ -132,10 +131,15 @@ add_action('wp_enqueue_scripts', function () {
     wp_dequeue_script('popper');
     wp_deregister_script('popper');
 
-    //$bootstrap_default_rel = '/assets/css/bootstrap-custom.css';
-    $bootstrap_default_rel  = '/assets/css/bootstrap.min.css';
+    /*
+    |--------------------------------------------------------------------------
+    | Bootstrap CSS
+    | Mantém o bootstrap.min.css completo para preservar o layout do tema.
+    | O CSS customizado poderá ser reativado depois, quando estiver validado.
+    |--------------------------------------------------------------------------
+    */
+    $bootstrap_default_rel = '/assets/css/bootstrap.min.css';
     $bootstrap_default_path = get_template_directory() . $bootstrap_default_rel;
-    $theme_style_dependencies = array();
 
     if (file_exists($bootstrap_default_path)) {
         wp_enqueue_style(
@@ -144,10 +148,16 @@ add_action('wp_enqueue_scripts', function () {
             array(),
             despachante_get_asset_version($bootstrap_default_rel, '4.6.2')
         );
-
-        $theme_style_dependencies[] = 'bootstrap-custom';
+        $theme_style_dependencies = array('bootstrap-custom');
+    } else {
+        $theme_style_dependencies = array();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | CSS do tema
+    |--------------------------------------------------------------------------
+    */
     wp_enqueue_style(
         'theme-style',
         get_template_directory_uri() . '/assets/css/estyle.css',
@@ -155,10 +165,18 @@ add_action('wp_enqueue_scripts', function () {
         despachante_get_asset_version('/assets/css/estyle.css', $theme_version)
     );
 
+    /*
+    |--------------------------------------------------------------------------
+    | JS do tema
+    |--------------------------------------------------------------------------
+    | Bootstrap JS removido para performance.
+    | Reative só se um dia você realmente usar modal/dropdown/collapse JS.
+    |--------------------------------------------------------------------------
+    */
     wp_enqueue_script(
         'theme-script',
         get_template_directory_uri() . '/assets/js/script.js',
-        array(),
+        array('jquery'),
         despachante_get_asset_version('/assets/js/script.js', $theme_version),
         true
     );
@@ -214,7 +232,7 @@ add_action('customize_controls_enqueue_scripts', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Otimizações de performance
+| OTIMIZAÇÕES DE PERFORMANCE
 |--------------------------------------------------------------------------
 */
 add_action('after_setup_theme', function () {
@@ -228,16 +246,11 @@ add_action('after_setup_theme', function () {
         'gallery',
         'caption',
         'style',
-        'script',
+        'script'
     ));
 
-    /*
-     * Tamanhos focados no hero:
-     * desktop: 1600x900
-     * mobile: 768x432
-     */
-    add_image_size('hero-desktop', 1600, 900, true);
-    add_image_size('hero-mobile', 768, 432, true);
+    add_image_size('hero-desktop', 1920, 959, true);
+    add_image_size('hero-mobile', 828, 1180, true);
 });
 
 add_action('init', function () {
@@ -248,11 +261,6 @@ add_action('init', function () {
     remove_action('wp_head', 'wp_generator');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Imagens em conteúdo
-|--------------------------------------------------------------------------
-*/
 add_filter('the_content', function ($content) {
     return preg_replace_callback('/<img[^>]*>/i', function ($matches) {
         $img = $matches[0];
@@ -297,15 +305,8 @@ add_filter('wp_get_attachment_image_attributes', function ($attr, $attachment, $
     return $attr;
 }, 10, 3);
 
-/*
-|--------------------------------------------------------------------------
-| CSS assíncrono
-|--------------------------------------------------------------------------
-*/
 add_filter('style_loader_tag', function ($tag, $handle, $href, $media) {
-    $async_styles = array('font-awesome', 'bootstrap-custom', 'theme-style');
-
-    if (!in_array($handle, $async_styles, true)) {
+    if ($handle !== 'font-awesome') {
         return $tag;
     }
 
@@ -320,11 +321,6 @@ add_action('wp_head', function () {
     echo '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>' . "\n";
 }, 1);
 
-/*
-|--------------------------------------------------------------------------
-| Scripts com defer
-|--------------------------------------------------------------------------
-*/
 add_filter('script_loader_tag', function ($tag, $handle, $src) {
     if (is_admin() || empty($src)) {
         return $tag;
@@ -338,7 +334,7 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
         'lgpd-script',
         'pre-analise-script',
         'slick',
-        'wp-google-review-slider',
+        'wp-google-review-slider'
     );
 
     if (!in_array($handle, $scripts, true)) {
@@ -354,58 +350,7 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
 
 /*
 |--------------------------------------------------------------------------
-| Validação de upload de imagem para hero
-|--------------------------------------------------------------------------
-*/
-if (!function_exists('despachante_validate_hero_image_upload')) {
-    function despachante_validate_hero_image_upload($file) {
-        if (empty($file['tmp_name']) || empty($file['type'])) {
-            return $file;
-        }
-
-        if (strpos((string) $file['type'], 'image/') !== 0) {
-            return $file;
-        }
-
-        $image_size = @getimagesize($file['tmp_name']);
-
-        if (!$image_size || empty($image_size[0]) || empty($image_size[1])) {
-            return $file;
-        }
-
-        $width  = (int) $image_size[0];
-        $height = (int) $image_size[1];
-        $bytes  = !empty($file['size']) ? (int) $file['size'] : 0;
-
-        $min_width  = 1200;
-        $min_height = 900;
-        $max_width  = 3200;
-        $max_height = 3200;
-        $max_bytes  = 4 * 1024 * 1024;
-
-        if ($width < $min_width || $height < $min_height) {
-            $file['error'] = 'A imagem do hero é muito pequena. Use pelo menos 1200x900 pixels.';
-            return $file;
-        }
-
-        if ($width > $max_width || $height > $max_height) {
-            $file['error'] = 'A imagem do hero é muito grande. Use no máximo 3200x3200 pixels.';
-            return $file;
-        }
-
-        if ($bytes > $max_bytes) {
-            $file['error'] = 'A imagem excede 4 MB. Envie uma versão mais leve.';
-            return $file;
-        }
-
-        return $file;
-    }
-}
-add_filter('wp_handle_upload_prefilter', 'despachante_validate_hero_image_upload');
-
-/*
-|--------------------------------------------------------------------------
-| Hero helpers
+| HERO HELPERS
 |--------------------------------------------------------------------------
 */
 if (!function_exists('despachante_maybe_get_local_webp_url')) {
@@ -414,18 +359,22 @@ if (!function_exists('despachante_maybe_get_local_webp_url')) {
             return $url;
         }
 
+        if (preg_match('/\.webp$/i', $url)) {
+            return $url;
+        }
+
         if (!preg_match('/\.(jpe?g|png)$/i', $url)) {
             return $url;
         }
 
-        $uploads  = wp_upload_dir();
+        $uploads = wp_upload_dir();
         $theme_uri = get_template_directory_uri();
         $theme_dir = get_template_directory();
 
         $webp_url = preg_replace('/\.(jpe?g|png)$/i', '.webp', $url);
 
         if (strpos($url, $uploads['baseurl']) === 0) {
-            $relative  = ltrim(str_replace($uploads['baseurl'], '', $url), '/');
+            $relative = ltrim(str_replace($uploads['baseurl'], '', $url), '/');
             $webp_path = trailingslashit($uploads['basedir']) . preg_replace('/\.(jpe?g|png)$/i', '.webp', $relative);
 
             if (file_exists($webp_path)) {
@@ -434,7 +383,7 @@ if (!function_exists('despachante_maybe_get_local_webp_url')) {
         }
 
         if (strpos($url, $theme_uri) === 0) {
-            $relative  = ltrim(str_replace($theme_uri, '', $url), '/');
+            $relative = ltrim(str_replace($theme_uri, '', $url), '/');
             $webp_path = trailingslashit($theme_dir) . preg_replace('/\.(jpe?g|png)$/i', '.webp', $relative);
 
             if (file_exists($webp_path)) {
@@ -446,11 +395,88 @@ if (!function_exists('despachante_maybe_get_local_webp_url')) {
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| Conversão automática para WebP
-|--------------------------------------------------------------------------
-*/
+if (!function_exists('despachante_url_file_exists_locally')) {
+    function despachante_url_file_exists_locally($url) {
+        if (empty($url) || !is_string($url)) {
+            return false;
+        }
+
+        $uploads = wp_upload_dir();
+
+        if (strpos($url, $uploads['baseurl']) === 0) {
+            $path = trailingslashit($uploads['basedir']) . ltrim(str_replace($uploads['baseurl'], '', $url), '/');
+            return file_exists($path);
+        }
+
+        $theme_uri = get_template_directory_uri();
+
+        if (strpos($url, $theme_uri) === 0) {
+            $path = trailingslashit(get_template_directory()) . ltrim(str_replace($theme_uri, '', $url), '/');
+            return file_exists($path);
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('despachante_build_hero_variant_url')) {
+    function despachante_build_hero_variant_url($source_url, $variant = '') {
+        if (empty($source_url) || !is_string($source_url)) {
+            return '';
+        }
+
+        $parts = wp_parse_url($source_url);
+
+        if (empty($parts['path'])) {
+            return $source_url;
+        }
+
+        $dirname  = trailingslashit(dirname($parts['path']));
+        $filename = wp_basename($parts['path']);
+        $filename = preg_replace('/-\d+x\d+(?=\.[^.]+$)/', '', $filename);
+
+        $ext  = pathinfo($filename, PATHINFO_EXTENSION);
+        $name = pathinfo($filename, PATHINFO_FILENAME);
+
+        if (empty($name)) {
+            return $source_url;
+        }
+
+        $base = '';
+        if (!empty($parts['scheme'])) {
+            $base .= $parts['scheme'] . '://';
+        }
+        if (!empty($parts['host'])) {
+            $base .= $parts['host'];
+        }
+        if (!empty($parts['port'])) {
+            $base .= ':' . $parts['port'];
+        }
+        $base .= $dirname;
+
+        $candidates = array();
+
+        if (!empty($variant)) {
+            $candidates[] = $base . $name . '-' . $variant . '.webp';
+
+            if (!empty($ext)) {
+                $candidates[] = $base . $name . '-' . $variant . '.' . $ext;
+            }
+        }
+
+        $candidates[] = despachante_maybe_get_local_webp_url($source_url);
+        $candidates[] = $source_url;
+
+        foreach ($candidates as $candidate) {
+            if (!empty($candidate) && despachante_url_file_exists_locally($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return $source_url;
+    }
+}
+
 if (!function_exists('despachante_generate_webp_for_attachment_files')) {
     function despachante_generate_webp_for_attachment_files($metadata, $attachment_id) {
         $uploads = wp_upload_dir();
@@ -469,8 +495,6 @@ if (!function_exists('despachante_generate_webp_for_attachment_files')) {
                 }
             }
         }
-
-        $files_to_process = array_unique($files_to_process);
 
         foreach ($files_to_process as $file_path) {
             if (!file_exists($file_path)) {
@@ -495,7 +519,7 @@ if (!function_exists('despachante_generate_webp_for_attachment_files')) {
                 continue;
             }
 
-            $editor->set_quality(78);
+            $editor->set_quality(82);
             $saved = $editor->save($webp_path, 'image/webp');
 
             if (is_wp_error($saved)) {
@@ -508,134 +532,43 @@ if (!function_exists('despachante_generate_webp_for_attachment_files')) {
 }
 add_filter('wp_generate_attachment_metadata', 'despachante_generate_webp_for_attachment_files', 10, 2);
 
-/*
-|--------------------------------------------------------------------------
-| Geração dedicada das versões do hero
-|--------------------------------------------------------------------------
-*/
-if (!function_exists('despachante_generate_hero_derivatives')) {
-    function despachante_generate_hero_derivatives($metadata, $attachment_id) {
-        $mime = get_post_mime_type($attachment_id);
-
-        if (!in_array($mime, array('image/jpeg', 'image/png', 'image/webp'), true)) {
-            return $metadata;
-        }
-
-        $full_path = get_attached_file($attachment_id);
-
-        if (!$full_path || !file_exists($full_path)) {
-            return $metadata;
-        }
-
-        $variants = array(
-            'hero-desktop' => array(
-                'width'  => 1600,
-                'height' => 900,
-            ),
-            'hero-mobile' => array(
-                'width'  => 768,
-                'height' => 432,
-            ),
-        );
-
-        foreach ($variants as $size_name => $size) {
-            $variant_editor = wp_get_image_editor($full_path);
-
-            if (is_wp_error($variant_editor)) {
-                continue;
-            }
-
-            $variant_editor->resize($size['width'], $size['height'], true);
-            $variant_editor->set_quality(78);
-
-            $saved = $variant_editor->save();
-
-            if (is_wp_error($saved) || empty($saved['file'])) {
-                continue;
-            }
-
-            if (empty($metadata['sizes']) || !is_array($metadata['sizes'])) {
-                $metadata['sizes'] = array();
-            }
-
-            $metadata['sizes'][$size_name] = array(
-                'file'      => wp_basename($saved['file']),
-                'width'     => (int) $saved['width'],
-                'height'    => (int) $saved['height'],
-                'mime-type' => $saved['mime-type'],
-            );
-
-            if (!empty($saved['path']) && preg_match('/\.(jpe?g|png)$/i', $saved['path'])) {
-                $webp_editor = wp_get_image_editor($saved['path']);
-
-                if (!is_wp_error($webp_editor)) {
-                    $webp_editor->set_quality(78);
-                    $webp_editor->save(
-                        preg_replace('/\.(jpe?g|png)$/i', '.webp', $saved['path']),
-                        'image/webp'
-                    );
-                }
-            }
-        }
-
-        return $metadata;
-    }
-}
-add_filter('wp_generate_attachment_metadata', 'despachante_generate_hero_derivatives', 20, 2);
-
 if (!function_exists('despachante_get_hero_sources')) {
     function despachante_get_hero_sources() {
         $default = get_template_directory_uri() . '/assets/img/hero.webp';
         $hero_setting = get_theme_mod('hero_bg_image', '');
         $desktop = '';
         $mobile  = '';
-        $default_source = $default;
 
         if (is_numeric($hero_setting)) {
             $attachment_id = absint($hero_setting);
+            $full = wp_get_attachment_image_url($attachment_id, 'full');
 
-            $desktop = wp_get_attachment_image_url($attachment_id, 'hero-desktop');
-            $mobile  = wp_get_attachment_image_url($attachment_id, 'hero-mobile');
-            $full    = wp_get_attachment_image_url($attachment_id, 'full');
-
-            if (!$desktop) {
-                $desktop = $full;
+            if ($full) {
+                $desktop = despachante_build_hero_variant_url($full, '1600x900');
+                $mobile  = despachante_build_hero_variant_url($full, '768x432');
             }
-
-            if (!$mobile) {
-                $mobile = $desktop;
-            }
-
-            $desktop = despachante_maybe_get_local_webp_url($desktop);
-            $mobile  = despachante_maybe_get_local_webp_url($mobile);
-            $default_source = $desktop ?: $default;
         } elseif (!empty($hero_setting) && is_string($hero_setting)) {
             $attachment_id = attachment_url_to_postid($hero_setting);
 
             if ($attachment_id) {
-                $desktop = wp_get_attachment_image_url($attachment_id, 'hero-desktop');
-                $mobile  = wp_get_attachment_image_url($attachment_id, 'hero-mobile');
-                $full    = wp_get_attachment_image_url($attachment_id, 'full');
+                $full = wp_get_attachment_image_url($attachment_id, 'full');
 
-                if (!$desktop) {
-                    $desktop = $full ?: $hero_setting;
+                if ($full) {
+                    $desktop = despachante_build_hero_variant_url($full, '1600x900');
+                    $mobile  = despachante_build_hero_variant_url($full, '768x432');
                 }
+            }
 
-                if (!$mobile) {
-                    $mobile = $desktop;
-                }
+            if (empty($desktop)) {
+                $desktop = despachante_build_hero_variant_url($hero_setting, '1600x900');
+            }
 
-                $desktop = despachante_maybe_get_local_webp_url($desktop);
-                $mobile  = despachante_maybe_get_local_webp_url($mobile);
-                $default_source = $desktop ?: $default;
-            } else {
-                $desktop = despachante_maybe_get_local_webp_url($hero_setting);
-                $mobile  = $desktop;
-                $default_source = $desktop ?: $default;
+            if (empty($mobile)) {
+                $mobile = despachante_build_hero_variant_url($hero_setting, '768x432');
             }
         }
 
-        if (empty($desktop)) {
+        if (empty($desktop) && despachante_url_file_exists_locally($default)) {
             $desktop = $default;
         }
 
@@ -646,50 +579,17 @@ if (!function_exists('despachante_get_hero_sources')) {
         return array(
             'desktop' => $desktop,
             'mobile'  => $mobile,
-            'default' => $default_source ?: $default,
+            'default' => $desktop,
         );
     }
 }
 
-if (!function_exists('despachante_render_hero_picture')) {
-    function despachante_render_hero_picture($sources, $alt = '') {
-        $desktop = !empty($sources['desktop']) ? $sources['desktop'] : '';
-        $mobile  = !empty($sources['mobile']) ? $sources['mobile'] : $desktop;
-
-        if (empty($desktop)) {
-            return '';
-        }
-
-        $alt = $alt !== '' ? $alt : get_bloginfo('name');
-
-        ob_start();
-        ?>
-        <picture class="hero-media__picture" aria-hidden="true">
-            <?php if (!empty($mobile) && $mobile !== $desktop) : ?>
-                <source media="(max-width: 768px)" srcset="<?php echo esc_url($mobile); ?>">
-            <?php endif; ?>
-            <img
-                class="hero-media__image"
-                src="<?php echo esc_url($desktop); ?>"
-                alt="<?php echo esc_attr($alt); ?>"
-                width="1600"
-                height="900"
-                fetchpriority="high"
-                loading="eager"
-                decoding="async">
-        </picture>
-        <?php
-        return trim(ob_get_clean());
-    }
-}
-
-/*
-|--------------------------------------------------------------------------
-| Preload do hero
-|--------------------------------------------------------------------------
-*/
 add_action('wp_head', function () {
-    if (!despachante_is_front_like()) {
+    if (!is_front_page() && !is_home()) {
+        return;
+    }
+
+    if (!function_exists('despachante_get_hero_sources')) {
         return;
     }
 
@@ -702,11 +602,6 @@ add_action('wp_head', function () {
     echo '<link rel="preload" as="image" fetchpriority="high" href="' . esc_url($hero_sources['desktop']) . '">' . "\n";
 }, 2);
 
-/*
-|--------------------------------------------------------------------------
-| Limpeza de assets do front
-|--------------------------------------------------------------------------
-*/
 add_action('wp_enqueue_scripts', function () {
     if (!is_user_logged_in()) {
         wp_deregister_style('dashicons');
@@ -715,7 +610,7 @@ add_action('wp_enqueue_scripts', function () {
 
 /*
 |--------------------------------------------------------------------------
-| SMTP do WordPress (Titan Email)
+| SMTP DO WORDPRESS (Titan Email)
 |--------------------------------------------------------------------------
 |
 | Configure as constantes no wp-config.php:
@@ -805,5 +700,3 @@ add_action('wp_mail_failed', function ($wp_error) {
         error_log('Despachante wp_mail_failed data: ' . wp_json_encode($data));
     }
 });
-
-
