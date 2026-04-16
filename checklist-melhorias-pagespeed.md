@@ -1,500 +1,117 @@
-# 🚀 Checklist de Melhorias PageSpeed – Despachante Digital Flow
+# 🚀 Checklist PageSpeed – Despachante Digital Flow (ATUALIZADO)
 
-## 📊 Situação Atual
+## 📊 Status Atual
 
-* Performance: ~74 (não melhorou após ajustes)
-* FCP: ótimo (~0.4s)
-* LCP: bom (~0.8s) ✅
-* CLS: **alto (1.011)** ❌ (principal problema atual)
-* TBT: 0ms ✅
-
-👉 **Conclusão:**
-O problema agora NÃO é velocidade — é **layout shift (CLS)** e **CSS/estrutura**
+Performance: ~75
+Acessibilidade: ~84
+Best Practices: 100
+SEO: 100
 
 ---
 
-# 🧠 PRIORIDADE 1 – CORRIGIR CLS (CRÍTICO)
+# 🧠 PRIORIDADE 1 – HERO (ALTO IMPACTO)
 
-## 🔥 Problema:
+## Status:
 
-CLS está **1.011 (péssimo)**
+✔ Responsivo funcionando
+❌ Ainda pode carregar imagem duplicada
 
-## 🎯 Causas prováveis:
+## Próxima ação:
 
-* Hero sem altura fixa
-* Imagens sem dimensão definida
-* Fonts carregando tarde
-* Elementos "pulando" na tela
-
-## ✅ Ações:
-
-### 1. Definir altura do HERO
-
-```css
-.hero-section--responsive-bg {
-  min-height: 80vh;
-}
-```
-
-OU melhor:
-
-```css
-.hero-section {
-  height: 100vh;
-}
-```
+* Implementar `<picture>` para carregar apenas 1 imagem
 
 ---
 
-### 2. Definir tamanho das imagens
+# 🧠 PRIORIDADE 2 – CLS (CRÍTICO)
 
-TODAS imagens devem ter:
+## Problema:
 
-```html
-<img width="XXX" height="XXX">
-```
+Layout shift ainda presente
 
----
+## Ações:
 
-### 3. Evitar mudança de layout no FAQ
-
-Adicionar:
-
-```css
-.collapse {
-  will-change: max-height;
-}
-```
+* Definir altura fixa do hero
+* Garantir width/height em imagens
+* Evitar elementos pulando (FAQ, botões)
 
 ---
 
-### 4. Garantir fontes estáveis
+# 🧠 PRIORIDADE 3 – CSS
 
-No CSS:
+## Problema:
 
-```css
-font-display: swap;
-```
+CSS bloqueante e não utilizado
 
----
+## Ações:
 
-# 🥇 PRIORIDADE 2 – HERO (IMPACTO DIRETO NO LCP)
-
-## 🔥 Problema:
-
-Hero ainda não está otimizado corretamente
-
-## ✅ Ações:
-
-### 1. NÃO usar background-image
-
-Trocar por:
-
-```html
-<picture>
-  <source srcset="hero-mobile.webp" media="(max-width: 768px)">
-  <img src="hero-desktop.webp" width="1600" height="900" loading="eager" fetchpriority="high">
-</picture>
-```
+* Reduzir Bootstrap (ou remover)
+* Eliminar CSS não usado
+* Evitar CSS inline no index.php
 
 ---
 
-### 2. Garantir peso da imagem
+# 🧠 PRIORIDADE 4 – JS
 
-* Desktop: < 150kb
-* Mobile: < 100kb
+## Status:
 
----
+✔ TBT = 0 (ótimo)
 
-# 🥈 PRIORIDADE 3 – CSS BLOQUEANTE
+## Ações:
 
-## 🔥 Problema:
-
-Muito CSS carregando antes da renderização
-
-## ✅ Ações:
-
-### 1. Manter preload (já feito)
-
-OK ✔
+* Remover dependências desnecessárias
+* Garantir defer em todos scripts
 
 ---
 
-### 2. Reduzir CSS não usado
+# 🧠 PRIORIDADE 5 – IMAGENS
 
-👉 Seu CSS está grande (3.4KB citado)
+## Status:
 
-* Remover:
+✔ WebP ativo
+✔ Lazy load ativo
 
-  * estilos não usados
-  * classes duplicadas
-  * bootstrap não utilizado
+## Ações:
 
----
-
-# 🥉 PRIORIDADE 4 – JS (JÁ QUASE OK)
-
-## Situação:
-
-* TBT = 0ms ✅
-
-## Melhorias restantes:
-
-### 1. Remover jQuery (se possível)
-
-Só se `handlePreAnalise.js` não depender
+* Garantir apenas 1 imagem carregada por breakpoint
+* Validar tamanhos corretos (768x432 / 1600x900)
 
 ---
 
-### 2. Garantir defer em todos scripts
+# 🧠 PRIORIDADE 6 – ACESSIBILIDADE
 
-Já implementado ✔
+## Problemas:
 
----
+* Inputs sem label
+* Contraste baixo
+* Hierarquia de headings
 
-# 🏆 PRIORIDADE 5 – IMAGENS (MELHORIA GERAL)
+## Ações:
 
-## ✅ Ações:
-
-### 1. Todas imagens com:
-
-```html
-loading="lazy"
-decoding="async"
-```
+* Associar labels
+* Ajustar cores
+* Revisar h1 → h2 → h3
 
 ---
 
-### 2. Usar WebP sempre
+# 🧪 PROCESSO
 
-✔ já implementado no backend
-
----
-
-### 3. Evitar imagens grandes no DOM
-
-* thumbnails pequenas
-* não carregar imagens invisíveis
-
----
-
-# ⚡ PRIORIDADE 6 – WORDPRESS CLEANUP
-
-## ✅ Ações:
-
-### 1. Remover coisas desnecessárias
-
-Já feito:
-
-* emoji ✔
-* wp_generator ✔
-
----
-
-### 2. Remover Dashicons no front
-
-✔ já feito
-
----
-
-# 🧪 PRIORIDADE 7 – TESTE CORRETO
-
-⚠️ IMPORTANTE:
-
-Sempre testar:
-
-* modo anônimo
-* celular (mais importante)
-* com cache limpo
-
----
-
-# 📌 RESUMO EXECUTIVO
-
-## ❌ O que está errado agora:
-
-* CLS ALTÍSSIMO (principal problema)
-* Hero ainda mal estruturado (background-image)
-* CSS possivelmente interferindo no layout
-
-## ✅ O que já está bom:
-
-* JS leve
-* LCP bom
-* WebP implementado
-* Lazy load aplicado
-
----
-
-# 🚀 PRÓXIMO PASSO (RECOMENDADO)
-
-1. Corrigir HERO (CRÍTICO)
-2. Corrigir CLS
-3. Reavaliar CSS
-
----
-
-# 💬 IMPORTANTE
-
-👉 Não tente otimizar tudo de uma vez
-👉 Faça 1 mudança → teste → medir
+✔ Fazer 1 ajuste
+✔ Testar no PageSpeed
+✔ Commit
+✔ Nova branch
 
 ---
 
 # 🎯 META
 
-* CLS: < 0.1
-* Performance: 90+
-* LCP: < 2.5s
-
----
-# 🚀 Checklist de Melhorias PageSpeed – Despachante Digital Flow
-
-## 📊 Situação Atual
-
-* Performance: ~74 (não melhorou após ajustes)
-* FCP: ótimo (~0.4s)
-* LCP: bom (~0.8s) ✅
-* CLS: **alto (1.011)** ❌ (principal problema atual)
-* TBT: 0ms ✅
-
-👉 **Conclusão:**
-O problema agora NÃO é velocidade — é **layout shift (CLS)** e **CSS/estrutura**
+Performance: 90+
+Acessibilidade: 90+
+CLS: < 0.1
+LCP: < 2.5s
 
 ---
 
-# 🧠 PRIORIDADE 1 – CORRIGIR CLS (CRÍTICO)
+# 🚀 PRÓXIMO PASSO
 
-## 🔥 Problema:
-
-CLS está **1.011 (péssimo)**
-
-## 🎯 Causas prováveis:
-
-* Hero sem altura fixa
-* Imagens sem dimensão definida
-* Fonts carregando tarde
-* Elementos "pulando" na tela
-
-## ✅ Ações:
-
-### 1. Definir altura do HERO
-
-```css
-.hero-section--responsive-bg {
-  min-height: 80vh;
-}
-```
-
-OU melhor:
-
-```css
-.hero-section {
-  height: 100vh;
-}
-```
-
----
-
-### 2. Definir tamanho das imagens
-
-TODAS imagens devem ter:
-
-```html
-<img width="XXX" height="XXX">
-```
-
----
-
-### 3. Evitar mudança de layout no FAQ
-
-Adicionar:
-
-```css
-.collapse {
-  will-change: max-height;
-}
-```
-
----
-
-### 4. Garantir fontes estáveis
-
-No CSS:
-
-```css
-font-display: swap;
-```
-
----
-
-# 🥇 PRIORIDADE 2 – HERO (IMPACTO DIRETO NO LCP)
-
-## 🔥 Problema:
-
-Hero ainda não está otimizado corretamente
-
-## ✅ Ações:
-
-### 1. NÃO usar background-image
-
-Trocar por:
-
-```html
-<picture>
-  <source srcset="hero-mobile.webp" media="(max-width: 768px)">
-  <img src="hero-desktop.webp" width="1600" height="900" loading="eager" fetchpriority="high">
-</picture>
-```
-
----
-
-### 2. Garantir peso da imagem
-
-* Desktop: < 150kb
-* Mobile: < 100kb
-
----
-
-# 🥈 PRIORIDADE 3 – CSS BLOQUEANTE
-
-## 🔥 Problema:
-
-Muito CSS carregando antes da renderização
-
-## ✅ Ações:
-
-### 1. Manter preload (já feito)
-
-OK ✔
-
----
-
-### 2. Reduzir CSS não usado
-
-👉 Seu CSS está grande (3.4KB citado)
-
-* Remover:
-
-  * estilos não usados
-  * classes duplicadas
-  * bootstrap não utilizado
-
----
-
-# 🥉 PRIORIDADE 4 – JS (JÁ QUASE OK)
-
-## Situação:
-
-* TBT = 0ms ✅
-
-## Melhorias restantes:
-
-### 1. Remover jQuery (se possível)
-
-Só se `handlePreAnalise.js` não depender
-
----
-
-### 2. Garantir defer em todos scripts
-
-Já implementado ✔
-
----
-
-# 🏆 PRIORIDADE 5 – IMAGENS (MELHORIA GERAL)
-
-## ✅ Ações:
-
-### 1. Todas imagens com:
-
-```html
-loading="lazy"
-decoding="async"
-```
-
----
-
-### 2. Usar WebP sempre
-
-✔ já implementado no backend
-
----
-
-### 3. Evitar imagens grandes no DOM
-
-* thumbnails pequenas
-* não carregar imagens invisíveis
-
----
-
-# ⚡ PRIORIDADE 6 – WORDPRESS CLEANUP
-
-## ✅ Ações:
-
-### 1. Remover coisas desnecessárias
-
-Já feito:
-
-* emoji ✔
-* wp_generator ✔
-
----
-
-### 2. Remover Dashicons no front
-
-✔ já feito
-
----
-
-# 🧪 PRIORIDADE 7 – TESTE CORRETO
-
-⚠️ IMPORTANTE:
-
-Sempre testar:
-
-* modo anônimo
-* celular (mais importante)
-* com cache limpo
-
----
-
-# 📌 RESUMO EXECUTIVO
-
-## ❌ O que está errado agora:
-
-* CLS ALTÍSSIMO (principal problema)
-* Hero ainda mal estruturado (background-image)
-* CSS possivelmente interferindo no layout
-
-## ✅ O que já está bom:
-
-* JS leve
-* LCP bom
-* WebP implementado
-* Lazy load aplicado
-
----
-
-# 🚀 PRÓXIMO PASSO (RECOMENDADO)
-
-1. Corrigir HERO (CRÍTICO)
-2. Corrigir CLS
-3. Reavaliar CSS
-
----
-
-# 💬 IMPORTANTE
-
-👉 Não tente otimizar tudo de uma vez
-👉 Faça 1 mudança → teste → medir
-
----
-
-# 🎯 META
-
-* CLS: < 0.1
-* Performance: 90+
-* LCP: < 2.5s
-
----
+👉 Implementar `<picture>` na hero
+(ganho mais rápido de performance agora)
